@@ -1,0 +1,13 @@
+{
+ "note": "What each kind of project tracks. 'real_estate' projects get every project-, phase- and building-level record. 'epc' projects get only the records listed here (the client asked for local-level contract labour and IT compliance on EPC sites). Edit this file to widen or narrow the EPC scope.",
+ "categories": {
+  "real_estate": { "label": "Real estate project", "plural": "Real estate projects", "all_project_records": true },
+  "epc": {
+   "label": "EPC project",
+   "plural": "EPC projects",
+   "all_project_records": false,
+   "record_ids": ["HRL-029", "HRL-030", "HRL-031", "LAB-004"],
+   "record_prefixes": ["IT"]
+  }
+ }
+}

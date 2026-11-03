@@ -1,0 +1,819 @@
+{
+ "generated_at": "2026-10-28T08:43:06.840Z",
+ "checked_laws": 48,
+ "register_records": 306,
+ "note": "First-pass check by an AI model from general knowledge of Indian real estate and construction law. Not legal advice. \"Not found\" means no register record mentions the law; it does not mean the law is being breached. Confirm each item with counsel before adding a record.",
+ "gaps": [
+  {
+   "id": "re-mofa",
+   "law": "Maharashtra Ownership Flats (Regulation of the Promotion of Construction, Sale, Management and Transfer) Act, 1963",
+   "obligation": "Promoter duties to flat purchasers; society formation and conveyance (partly overlaps RERA)",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Residential flats in Maharashtra; check overlap with RERA",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "re-maoa",
+   "law": "Maharashtra Apartment Ownership Act, 1970",
+   "obligation": "Deed of declaration and apartment ownership documents",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Where apartments are registered under this Act",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "re-landrev",
+   "law": "Maharashtra Land Revenue Code, 1966 (non-agricultural use permission, land records)",
+   "obligation": "NA permission / conversion, 7/12 and property card hygiene, mutation",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Where land is or was agricultural",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "re-stamp",
+   "law": "Maharashtra Stamp Act, 1958 and Registration Act, 1908",
+   "obligation": "Stamp duty and registration of agreements for sale and conveyances",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Every sale / conveyance",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "re-coop",
+   "law": "Maharashtra Co-operative Societies Act, 1960",
+   "obligation": "Registration of the co-operative housing society",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Where a co-operative society is formed",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "re-crz",
+   "law": "Coastal Regulation Zone Notification, 2019",
+   "obligation": "CRZ clearance",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Sites in the CRZ only",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "re-electrical",
+   "law": "Electricity Act, 2003 and Central Electricity Authority safety rules (Electrical Inspector approval of substations, DG sets, HT installations)",
+   "obligation": "Electrical Inspector approval and periodic testing of electrical installations",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Sites / buildings with transformers, DG sets or HT installations",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "lab-cess",
+   "law": "Building and Other Construction Workers Welfare Cess Act, 1996",
+   "obligation": "Cess on cost of construction paid to the welfare board",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Construction with a cost above the notified limit",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "lab-clra-licence",
+   "law": "Contract Labour Act: licence held by each labour contractor, and the registers kept on site",
+   "obligation": "Check each labour contractor holds a valid licence and keeps the registers",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Where contract labour is engaged",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "lab-ismw",
+   "law": "Inter-State Migrant Workmen (Regulation of Employment and Conditions of Service) Act, 1979",
+   "obligation": "Licence and registers for workers brought from another state",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Where a contractor recruits workers from another state",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "lab-gratuity",
+   "law": "Payment of Gratuity Act, 1972",
+   "obligation": "Gratuity to eligible employees; insurance / trust arrangement",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Establishments with 10 or more employees",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "lab-maternity",
+   "law": "Maternity Benefit Act, 1961",
+   "obligation": "Maternity leave and creche rules",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Establishments with 10 or more employees",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "lab-state",
+   "law": "State-specific labour rules for sites outside Maharashtra (Bihar, Rajasthan, etc.): state BOCW Rules, Labour Welfare Fund, Professional Tax, Shops and Establishments, minimum wage notifications",
+   "obligation": "Local registrations and returns at each state",
+   "applies_to": [
+    "epc"
+   ],
+   "when": "EPC sites in Bihar (Bhojpur, Munger) and Rajasthan (Udaipur)",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "tax-gst-rcm",
+   "law": "GST reverse charge and works-contract supply rules",
+   "obligation": "Pay GST under reverse charge where applicable; correct rate on works contracts",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Construction services",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "tax-gst-tds",
+   "law": "GST TDS on payments by government entities (Section 51, CGST Act)",
+   "obligation": "Reconcile tax deducted by PWD / MIDC / public bodies; claim credit",
+   "applies_to": [
+    "epc"
+   ],
+   "when": "EPC contracts with government bodies",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "epc-insurance",
+   "law": "Contractor's All Risk, third-party liability and workmen's compensation insurance (usually a contract condition)",
+   "obligation": "Keep policies in force for the life of the contract",
+   "applies_to": [
+    "epc"
+   ],
+   "when": "Most EPC contracts",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "epc-explosives",
+   "law": "Explosives Act, 1884 and Explosives Rules, 2008",
+   "obligation": "Licence for storing or using explosives for blasting",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Only where blasting is done",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  },
+  {
+   "id": "epc-petroleum",
+   "law": "Petroleum Act, 1934 and Petroleum Rules, 2002",
+   "obligation": "Licence for storing diesel above the exempted quantity",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Sites storing diesel for DG sets / machinery",
+   "matched_records": [],
+   "matched_count": 0,
+   "status": "not found"
+  }
+ ],
+ "mentioned": [
+  {
+   "id": "re-rera",
+   "law": "Real Estate (Regulation and Development) Act, 2016 and MahaRERA rules",
+   "obligation": "Project registration, disclosures, escrow, quarterly updates, agreements for sale",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "All registrable projects",
+   "matched_records": [
+    "MAR-001",
+    "MAR-002",
+    "MAR-003",
+    "MAR-004",
+    "MAR-005",
+    "MAR-006",
+    "MAR-007",
+    "FIN-001",
+    "FIN-002",
+    "LEG-001",
+    "LEG-002",
+    "LEG-003"
+   ],
+   "matched_count": 53,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-mrtp",
+   "law": "Maharashtra Regional and Town Planning Act, 1966 / UDCPR",
+   "obligation": "Development permission, commencement, occupancy",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "All projects in Maharashtra",
+   "matched_records": [
+    "SAN-004",
+    "SAN-015",
+    "SAN-016",
+    "SAN-018",
+    "SAN-019",
+    "SAN-020",
+    "SAN-021",
+    "SAN-022",
+    "SAN-062",
+    "SAN-063",
+    "SAN-064",
+    "SAN-065"
+   ],
+   "matched_count": 16,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-deemed",
+   "law": "Conveyance of title and common areas to the society or allottees (MOFA Section 11 deemed conveyance if the promoter does not)",
+   "obligation": "Convey title and common areas to the society within the statutory period",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Residential societies",
+   "matched_records": [
+    "LEG-009",
+    "SAN-051"
+   ],
+   "matched_count": 2,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-consumer",
+   "law": "Consumer Protection Act, 2019",
+   "obligation": "Handling buyer complaints; unfair trade practice in marketing",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "All sales to consumers",
+   "matched_records": [
+    "MAR-008",
+    "MAR-009",
+    "MAR-010"
+   ],
+   "matched_count": 3,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-fire",
+   "law": "Maharashtra Fire Prevention and Life Safety Measures Act, 2006",
+   "obligation": "Fire NOC, annual fire-safety certification",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Buildings above the notified height / area",
+   "matched_records": [
+    "ADM-001",
+    "MEP-012",
+    "SAN-005",
+    "SAN-006"
+   ],
+   "matched_count": 4,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-lifts",
+   "law": "Maharashtra Lifts, Escalators and Moving Walks Act, 2017",
+   "obligation": "Lift permission, licence, periodic inspection",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Buildings with lifts",
+   "matched_records": [
+    "MEP-001",
+    "MEP-002",
+    "MEP-003",
+    "MEP-004",
+    "MEP-005",
+    "MEP-006",
+    "MEP-007",
+    "MEP-008",
+    "HEA-013",
+    "HEA-014",
+    "HEA-015",
+    "HEA-016"
+   ],
+   "matched_count": 13,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-eia",
+   "law": "Environment Impact Assessment Notification, 2006",
+   "obligation": "Environmental Clearance before construction above the thresholds",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Built-up area of 20,000 sq m or more",
+   "matched_records": [
+    "EC-001",
+    "EC-002",
+    "EC-003",
+    "EC-004",
+    "EC-005",
+    "EC-006",
+    "SAN-005",
+    "SAN-010",
+    "SAN-012",
+    "SAN-023"
+   ],
+   "matched_count": 10,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-pollution",
+   "law": "Water (Prevention and Control of Pollution) Act, 1974 and Air (Prevention and Control of Pollution) Act, 1981",
+   "obligation": "Consent to Establish and Consent to Operate from the Pollution Control Board",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Projects needing consent",
+   "matched_records": [
+    "EC-003",
+    "EC-004",
+    "EC-007",
+    "EC-008",
+    "SAN-023",
+    "SAN-024"
+   ],
+   "matched_count": 6,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-cnd",
+   "law": "Construction and Demolition Waste Management Rules, 2016",
+   "obligation": "Segregation and disposal of C&D waste",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All construction sites",
+   "matched_records": [
+    "EC-014",
+    "EC-015",
+    "EC-016",
+    "EC-017",
+    "EC-018",
+    "EC-019",
+    "EC-020",
+    "EC-021",
+    "EC-022",
+    "EC-023",
+    "EC-024",
+    "EC-025"
+   ],
+   "matched_count": 13,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-swm",
+   "law": "Solid Waste Management Rules, 2016",
+   "obligation": "Segregation of wet / dry waste, composting for large complexes",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Completed residential / commercial complexes",
+   "matched_records": [
+    "MEP-010",
+    "EC-012",
+    "EC-013",
+    "EC-015",
+    "SAN-025"
+   ],
+   "matched_count": 5,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-noise",
+   "law": "Noise Pollution (Regulation and Control) Rules, 2000",
+   "obligation": "Noise limits on site",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All sites",
+   "matched_records": [
+    "HEA-019",
+    "HEA-020",
+    "HEA-021",
+    "HEA-022",
+    "HEA-023"
+   ],
+   "matched_count": 5,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-trees",
+   "law": "Maharashtra (Urban Areas) Protection and Preservation of Trees Act, 1975",
+   "obligation": "Permission for cutting or transplanting trees; tree plantation",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Sites with trees",
+   "matched_records": [
+    "SAN-007",
+    "SAN-008"
+   ],
+   "matched_count": 2,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-groundwater",
+   "law": "Maharashtra Ground Water (Development and Management) Act, 2009 / CGWA guidelines",
+   "obligation": "NOC for extracting ground water",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Where ground water is extracted",
+   "matched_records": [
+    "EC-006"
+   ],
+   "matched_count": 1,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-aai",
+   "law": "Aircraft (Demolition of Obstructions) Rules / AAI height clearance; defence funnel zones",
+   "obligation": "Height clearance near airports and defence installations",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Sites near aerodromes",
+   "matched_records": [
+    "SAN-003"
+   ],
+   "matched_count": 1,
+   "status": "mentioned"
+  },
+  {
+   "id": "re-stp",
+   "law": "Sewage treatment and rain-water harvesting conditions (UDCPR / Pollution Control Board consent conditions)",
+   "obligation": "Operate STP; harvest rain water; keep consent conditions",
+   "applies_to": [
+    "real_estate"
+   ],
+   "when": "Projects with these consent conditions",
+   "matched_records": [
+    "EC-007",
+    "SAN-065"
+   ],
+   "matched_count": 2,
+   "status": "mentioned"
+  },
+  {
+   "id": "lab-bocw",
+   "law": "Building and Other Construction Workers (Regulation of Employment and Conditions of Service) Act, 1996 and Maharashtra BOCW Rules",
+   "obligation": "Establishment registration, safety officer / committee, safety measures",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All construction establishments",
+   "matched_records": [
+    "HEA-001",
+    "HEA-002",
+    "HEA-003",
+    "HEA-004",
+    "HEA-005",
+    "HEA-006",
+    "HEA-007",
+    "HEA-008",
+    "HEA-009",
+    "HEA-010",
+    "HEA-011",
+    "HEA-012"
+   ],
+   "matched_count": 18,
+   "status": "mentioned"
+  },
+  {
+   "id": "lab-clra",
+   "law": "Contract Labour (Regulation and Abolition) Act, 1970",
+   "obligation": "Principal employer registration; contractor licence; registers; amenities",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Establishments engaging 20 or more contract workers",
+   "matched_records": [
+    "HRL-029",
+    "HRL-030",
+    "HRL-031"
+   ],
+   "matched_count": 3,
+   "status": "mentioned"
+  },
+  {
+   "id": "lab-ec",
+   "law": "Employees' Compensation Act, 1923",
+   "obligation": "Compensation for work injury; accident reporting",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All employers",
+   "matched_records": [
+    "LAB-021",
+    "LAB-022",
+    "LAB-023",
+    "LAB-024"
+   ],
+   "matched_count": 4,
+   "status": "mentioned"
+  },
+  {
+   "id": "lab-pf-esi",
+   "law": "Employees' Provident Funds Act, 1952 and Employees' State Insurance Act, 1948",
+   "obligation": "Registration, monthly contributions and returns",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Covered establishments",
+   "matched_records": [
+    "LAB-001",
+    "LAB-002",
+    "LAB-003",
+    "LAB-004",
+    "LAB-005",
+    "LAB-006",
+    "LAB-007",
+    "LAB-008",
+    "LAB-009",
+    "LAB-010"
+   ],
+   "matched_count": 10,
+   "status": "mentioned"
+  },
+  {
+   "id": "lab-wages",
+   "law": "Code on Wages / Minimum Wages and Payment of Wages",
+   "obligation": "Statutory minimum wages, timely payment, bonus",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All employers",
+   "matched_records": [
+    "LAB-005",
+    "LAB-010",
+    "LAB-011",
+    "LAB-012",
+    "LAB-013",
+    "LAB-014",
+    "SEC-029",
+    "HRL-009",
+    "HRL-010",
+    "HRL-011",
+    "HRL-012",
+    "HRL-013"
+   ],
+   "matched_count": 28,
+   "status": "mentioned"
+  },
+  {
+   "id": "lab-poshl",
+   "law": "Sexual Harassment of Women at Workplace Act, 2013",
+   "obligation": "Internal Committee, annual report",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Offices and sites with 10 or more employees",
+   "matched_records": [
+    "LAB-038",
+    "LAB-039",
+    "LAB-040",
+    "SEC-026",
+    "SEC-027"
+   ],
+   "matched_count": 5,
+   "status": "mentioned"
+  },
+  {
+   "id": "tax-gst",
+   "law": "Central / State GST Acts (supply of works contract, reverse charge, input tax credit, GSTR-1, 3B, 9)",
+   "obligation": "Monthly and annual returns; GST on construction services and RCM",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All registered taxpayers",
+   "matched_records": [
+    "FIN-008",
+    "FIN-009"
+   ],
+   "matched_count": 2,
+   "status": "mentioned"
+  },
+  {
+   "id": "tax-gst-3b",
+   "law": "GSTR-3B (monthly GST payment return) and reconciliation of input tax credit",
+   "obligation": "File GSTR-3B monthly; reconcile credit with GSTR-2B",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All GST-registered taxpayers",
+   "matched_records": [
+    "FIN-008"
+   ],
+   "matched_count": 1,
+   "status": "mentioned"
+  },
+  {
+   "id": "tax-it",
+   "law": "Income-tax Act, 1961 (TDS on contractor payments, advance tax, returns, tax audit)",
+   "obligation": "TDS deduction and quarterly returns; advance tax; return and audit",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All companies",
+   "matched_records": [
+    "FIN-003",
+    "FIN-004",
+    "FIN-005",
+    "FIN-006",
+    "FIN-007",
+    "FIN-011"
+   ],
+   "matched_count": 6,
+   "status": "mentioned"
+  },
+  {
+   "id": "tax-pt",
+   "law": "Maharashtra State Tax on Professions, Trades, Callings and Employments Act, 1975",
+   "obligation": "Deduct and remit profession tax",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Employers in Maharashtra",
+   "matched_records": [
+    "FIN-010"
+   ],
+   "matched_count": 1,
+   "status": "mentioned"
+  },
+  {
+   "id": "corp-ca",
+   "law": "Companies Act, 2013",
+   "obligation": "Annual filings, board and general meetings, registers",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "All companies",
+   "matched_records": [
+    "SEC-001",
+    "SEC-002",
+    "SEC-003",
+    "SEC-004",
+    "SEC-005",
+    "SEC-006",
+    "SEC-007",
+    "SEC-008",
+    "SEC-009",
+    "SEC-010",
+    "SEC-011",
+    "SEC-012"
+   ],
+   "matched_count": 25,
+   "status": "mentioned"
+  },
+  {
+   "id": "corp-fema",
+   "law": "Foreign Exchange Management Act, 1999",
+   "obligation": "Reporting of foreign investment and export receipts",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Where foreign money is involved",
+   "matched_records": [
+    "SEC-028",
+    "SEC-029"
+   ],
+   "matched_count": 2,
+   "status": "mentioned"
+  },
+  {
+   "id": "corp-dpdp",
+   "law": "Digital Personal Data Protection Act, 2023; Information Technology Act, 2000; CERT-In directions, 2022",
+   "obligation": "Notices, consent, security, breach reporting",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Anyone processing personal data",
+   "matched_records": [
+    "IT-016",
+    "IT-017",
+    "IT-018",
+    "IT-019",
+    "IT-020",
+    "IT-021",
+    "IT-030",
+    "IT-031",
+    "IT-032",
+    "IT-033"
+   ],
+   "matched_count": 10,
+   "status": "mentioned"
+  },
+  {
+   "id": "epc-hazwaste",
+   "law": "Hazardous and Other Wastes (Management and Transboundary Movement) Rules, 2016",
+   "obligation": "Authorisation and returns for used oil, paint waste etc.",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Where such waste is generated",
+   "matched_records": [
+    "EC-009",
+    "EC-010",
+    "EC-011"
+   ],
+   "matched_count": 3,
+   "status": "mentioned"
+  },
+  {
+   "id": "epc-mv",
+   "law": "Motor Vehicles Act, 1988 (site vehicles, cranes on road, PUC, insurance)",
+   "obligation": "Valid registration, licences, PUC and insurance for vehicles",
+   "applies_to": [
+    "real_estate",
+    "epc"
+   ],
+   "when": "Where the company runs vehicles",
+   "matched_records": [
+    "ADM-003",
+    "ADM-004",
+    "ADM-005"
+   ],
+   "matched_count": 3,
+   "status": "mentioned"
+  }
+ ]
+}

@@ -16,7 +16,7 @@ npm start                  # http://localhost:8000
 Required `.env` values: `MONGODB_URI`, and for the first run `ADMIN_EMAIL` +
 `ADMIN_PASSWORD` (creates the first admin when there are no users) and
 `SESSION_SECRET`. Remove `ADMIN_PASSWORD` once you have signed in; sign in, then
-change the password from the **Password** button in the top bar.
+change the password from **Settings** in the left menu.
 
 In Atlas, add your IP address under **Network Access**, otherwise the server cannot
 connect (the error looks like a TLS / "internal error" failure).
@@ -89,3 +89,99 @@ acceptance checks — item counts by department and type — are printed by
 2. Email digest reminders are not implemented (no scheduler).
 3. Re-import/diff of a newer master sheet is a manual script re-run.
 4. Compliance Head, Owner and Approver currently have identical permissions.
+
+
+## Data model and migrations
+
+The master register (306 records) lives in `app/items.json`; MongoDB holds everything a team enters:
+`companies`, `projects`, `phases`, `buildings`, `applicability` (one decision per record per company/project/phase/building),
+`tracking`, `documents`, `audit`, `stage_overrides`, `users`.
+
+Each migration is a dry run unless given `--apply`, takes a full backup into `server/backups/` first, and is safe to re-run.
+Run from the `server` folder, in this order on a fresh setup:
+
+```
+node migrate/stages-v2.mjs --apply          # stage framework S0-S8 + per-record stage/level/deadline metadata
+node migrate/applicability-v1.mjs --apply   # writes app/applicability.json (the set-up questions)
+node migrate/setup-v1.mjs --apply           # default company, a "Phase 1" per project, first applicability decisions
+node migrate/backup.mjs                     # a backup on its own, any time
+```
+
+`app/core.js` is shared by the browser and the server: it decides which record is tracked against which company, project,
+phase or building, and how applicability is worked out from the set-up answers.
+
+More migrations and tools (all dry-run unless `--apply`, all take a backup first):
+
+```
+node migrate/projects-v1.mjs --apply        # adds the client's 14 real estate + 13 EPC projects to the single company
+node migrate/coverage-review.mjs --apply    # checks the register against laws typical for real estate / EPC; writes app/coverage-gaps.json
+```
+
+Roles (`server/access.mjs`): Master Admin, Company Admin, Compliance Manager, Department Head, Compliance Owner, Approver,
+Project Manager, Auditor. A user can also be limited to chosen projects (Users tab); the server filters every read and write.
+
+Other data files in `app/`: `profiles.json` (what EPC vs real estate projects track), `applicability.json` (the set-up questions),
+`dependencies.json` (proposed prerequisites between records; none are legally validated yet), `coverage-gaps.json`.
+Reminder rules are edited in Settings; a check runs 20 seconds after start and every 6 hours, and notices appear in the bell.
+## Real Estate Compliance checklist (CHK-001 to CHK-209)
+
+The consolidated CSV (`data-prep/Maharashtra_RealEstate_Compliance_Consolidated.csv`) holds the 306 register records plus 209 checklist records: 95 for a new project and 114 for a redevelopment. They are added by `server/migrate/real-estate-checklist-v1.mjs` (dry run by default, `--apply` to write; it backs up first, never changes the original 306 records, and can be re-run safely). Stage placement, setup questions and links to existing records are in `server/migrate/checklist-rules.mjs`; the import report is `data-prep/real-estate-checklist-report.md`. After applying, run `node migrate/applicability-v1.mjs --apply` and restart the server.
+
+Each project answers one new setup question, "Is this a redevelopment project?". New-project records apply when it is No, redevelopment records when it is Yes, and redevelopment records tagged society / MHADA / SRA / tenanted / cluster also need that track.
+
+## Project compliance intelligence (dashboard)
+
+The Dashboard now opens with a health score, an AI analysis, risks, stage readiness, an action centre, document health and a trend, for the
+selected project, the company-wide view, or all projects. Code: `server/health.mjs` (the score; pure, no AI), `server/intel.mjs`
+(snapshots, recommendations, AI analysis and validation), routes in `server/server.js`, screens in `app/index.html`.
+
+```
+node migrate/risk-proposals-v1.mjs --apply   # suggested risk levels read from the register's penalty wording (never used until accepted)
+node migrate/health-v1.mjs --apply           # indexes, default score settings, first snapshots and recommendations
+node tests/health.test.mjs                   # runs the score tests (no database needed)
+```
+
+Collections added: `risk_overrides`, `health_snapshots`, `ai_recommendations`, `ai_analyses`; settings document `settings/health`.
+The AI uses the same keys as Ask AI (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`); it is optional, the score works without it.
+## Regulatory Updates
+
+A **Regulatory Updates** page (left menu) lists circulars, notifications and orders found on official sources, with an AI summary, the projects they may affect, and a review workflow. It is built into the existing app: same login and roles, same MongoDB, same notification bell.
+
+**What runs, and when.** The server (not the browser) checks every enabled source **every day at 08:00 IST**, even when nobody is signed in. If the server was off at 08:00 it catches up shortly after it starts. Administrators can also press *Check sources now*, *Check all now* or *Retry failed* (Settings → Regulatory sources); these run in the background.
+
+**Per document:** fetch → read the text (PDF or web page) → hash it → skip if already known (same URL, same content hash, or same authority + circular number) → keep a copy of PDFs → AI analysis → match against projects → one notification. A changed document is detected by its hash, analysed again, flagged *Changed — review again*, and keeps earlier decisions.
+
+**Sources** (Settings → Regulatory sources, administrators only). Seeded, after being opened and checked on 2026-10-28:
+
+| Source | How |
+|---|---|
+| PCMC circulars, MPCB circulars | monitored daily (PCMC circular PDFs are scanned images, so they are stored with the official link and marked *needs manual reading*) |
+| MahaRERA orders & circulars | **off**: its robots.txt answers HTTP 403, so automated reading is not assumed to be allowed. An admin may switch it on after confirming permission (tick the permission box when editing the source) |
+| MoEFCC circulars | **off**: the list is built by script and could not be read reliably |
+| CPCB | manual only: robots.txt disallows automated access |
+| MoHUA, Directorate of Town Planning, Maharashtra Fire Services, Maharashtra GR portal, Maharashtra e-Gazette, PMC, India Code | manual only: no readable listing, or the site was unreachable when checked |
+
+For anything that cannot be monitored, an administrator uses **Add official document** (link to the official document + pasted text or an uploaded PDF). The server never bypasses a CAPTCHA, login or robots.txt, refuses private-network addresses, limits download size (15 MB) and reads sites slowly (about one page every 1.2 s). A source that fails shows its error and counts failures; *Retry failed* tries again.
+
+**AI.** Uses the same provider as Ask AI (`GEMINI_API_KEY` first, else `ANTHROPIC_API_KEY`). The document text is sent as *untrusted data* with instructions not to follow anything inside it. **No company or project data is sent to the AI**; matching to projects is rule-based on the server (location, planning authority, project category, stage). The AI's answer is validated: circular numbers, deadlines and quotes must appear in the document text or are dropped; priority is capped (Critical needs a binding obligation with a verified deadline; informational items are Low and never mandatory); unknown fields are ignored. Everything is labelled *AI summary — unverified* until a reviewer marks it checked. If no AI is available the document is stored as *analysis pending* and retried on later runs. Each run sends at most `REGULATORY_AI_PER_RUN` (default 15) documents to the AI.
+
+**Review workflow:** New Update → AI Analysed → Compliance Review → Applicable / Not Applicable / Legal Review → Action Assigned → Implemented → Closed. A reviewer (Master Admin, Company Admin, Compliance Manager: capability `review_regulatory`) confirms or rejects applicability per project (with a reason), assigns a person, creates tasks, links existing compliance records, comments and closes. **Nothing is automatic:** no compliance record is created, no compliance status is changed, nothing is marked implemented by the system. Tasks are to-dos stored on the update. Project-restricted users only see updates that could affect their projects.
+
+**MongoDB.** New collections `regulatory_sources`, `regulatory_updates` (analysis, hash, stored-copy reference, per-project impacts, tasks, comments, review history) and `regulatory_runs` (monitoring history). Notifications reuse the existing `notifications` collection (extra fields `reg_id`, `project_ids`, `to`, `dismissed_by`). Nothing existing was changed or removed.
+
+**Set-up on an existing database:** `node migrate/regulatory-v1.mjs` (dry run), then `node migrate/regulatory-v1.mjs --apply` (backs up first, creates indexes, adds the sources above; existing sources are never overwritten). Optional env: `REGULATORY_AI_PER_RUN`, `REGULATORY_MONITORING=off`. Tests: `node --test tests/regulatory.test.mjs`.
+
+**Limits.** Scanned PDFs have no text layer and are not OCR'd. Sites that block or hide automated access need manual entry. AI summaries can be wrong: always read the official document; none of this is legal advice.
+
+## Documents (create, upload a format, review)
+
+A **Documents** page in the sidebar has three tabs.
+
+- **Create a document** - ready-made formats (authorisation letter, declaration and undertaking, NOC request, application cover letter, intimation of commencement, reply to notice, board resolution, extension request). Pick one, choose a project (company, project name, RERA number, location and date are filled in automatically), fill the rest and save. Empty required fields are allowed: the document is saved as a *Draft* and shows `[Field name]` until filled.
+- **Upload your own format** - a Word (`.docx`, best), PDF or text file. Blanks and placeholders (`____`, `.....`, `[Project name]`, `<Name>`, `{{name}}`) are found automatically, labelled from the words before them, given a type (date, number, email...) and an auto-fill source where the label is clear. The person uploading checks them, can rename or remove fields, and can add one the detector missed by typing the exact words in the document. Word formats keep all their formatting; scanned PDFs are read with OCR.
+- **My documents** - every saved document, with its values, version history (the last 10 versions are kept), preview, and download as Word or text. A document tied to a project follows that project's access; a document without a project is private to its author and administrators.
+- **Review a document** - upload any application, declaration, letter or agreement (or pick a saved one) and it is checked against the regulations in `knowledge/` and the compliance register. You get what the document is, readiness (Ready to submit / Needs changes / Major gaps), checks with the rule each is based on, suggested wording to paste, missing information, and a downloadable Word report. Quotes shown as evidence are verified to exist in the document; rule references are limited to passages that were actually supplied. If the AI is unavailable, basic checks (blanks left, no date, no signature block) still run and the review can be retried.
+
+Needs `upload_docs` to create, upload or review; everyone signed in can read what they have access to. Files are stored in the same GridFS bucket as other documents. Collections: `doc_templates`, `doc_generated`, `doc_analyses`. Tests: `node --test tests/docx.test.mjs tests/docstudio.test.mjs`.
+
+**Chatbot knowledge:** PDFs in `knowledge/` are indexed when the server starts. Identical copies are indexed once; pages that are scans or have unreadable (legacy-font) Marathi/Hindi text are read with OCR and translated to English, and the result is cached in `knowledge/.ocr-cache/`.

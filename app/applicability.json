@@ -1,0 +1,1157 @@
+{
+ "version": 1,
+ "note": "Setup questions and the records they decide. Each flag is a yes/no fact; \"derive\" lets a number entered in setup answer it automatically.",
+ "flags": {
+  "owns_vehicles": {
+   "scope": "company",
+   "label": "Owns/operates motor vehicles",
+   "question": "Does the company own or operate motor vehicles?",
+   "group": "Vehicles"
+  },
+  "intl_travel": {
+   "scope": "company",
+   "label": "Employees travel abroad on duty",
+   "question": "Do employees undertake official international travel?",
+   "group": "Employees & labour"
+  },
+  "workers_500plus": {
+   "scope": "company",
+   "label": "500+ building workers",
+   "question": "Are 500 or more building workers employed at the establishment?",
+   "group": "Employees & labour"
+  },
+  "child_data": {
+   "scope": "company",
+   "label": "Processes children's personal data",
+   "question": "Does the company process personal data of children (under 18)?",
+   "group": "Data protection & IT"
+  },
+  "processes_spdi": {
+   "scope": "company",
+   "label": "Collects/processes SPDI",
+   "question": "Does the company collect or process sensitive personal data (SPDI)?",
+   "group": "Data protection & IT"
+  },
+  "discloses_spdi": {
+   "scope": "company",
+   "label": "Discloses SPDI to third parties",
+   "question": "Does the company disclose SPDI to third parties?",
+   "group": "Data protection & IT"
+  },
+  "govt_requests_spdi": {
+   "scope": "company",
+   "label": "Government agencies request SPDI",
+   "question": "Does a Government agency legally request SPDI from the company?",
+   "group": "Data protection & IT"
+  },
+  "transfers_spdi": {
+   "scope": "company",
+   "label": "Transfers SPDI to another party",
+   "question": "Is SPDI transferred to another body corporate or person?",
+   "group": "Data protection & IT"
+  },
+  "employs_5plus": {
+   "scope": "company",
+   "label": "5+ persons employed",
+   "question": "Does the establishment employ 5 or more persons? (or enter the employee count)",
+   "group": "Employees & labour",
+   "derive": [
+    {
+     "scope": "company",
+     "field": "employee_count",
+     "gte": 5
+    }
+   ]
+  },
+  "employs_10plus": {
+   "scope": "company",
+   "label": "10+ persons employed",
+   "question": "Does the establishment employ 10 or more persons? (or enter the employee count)",
+   "group": "Employees & labour",
+   "derive": [
+    {
+     "scope": "company",
+     "field": "employee_count",
+     "gte": 10
+    }
+   ]
+  },
+  "employs_20plus": {
+   "scope": "company",
+   "label": "20+ persons employed",
+   "question": "Does the establishment employ 20 or more persons? (or enter the employee count)",
+   "group": "Employees & labour",
+   "derive": [
+    {
+     "scope": "company",
+     "field": "employee_count",
+     "gte": 20
+    }
+   ]
+  },
+  "employs_50plus": {
+   "scope": "company",
+   "label": "More than 50 workers",
+   "question": "Does the establishment employ more than 50 workers? (or enter the employee count)",
+   "group": "Employees & labour",
+   "derive": [
+    {
+     "scope": "company",
+     "field": "employee_count",
+     "gte": 51
+    }
+   ]
+  },
+  "covered_epf": {
+   "scope": "company",
+   "label": "Covered under EPF",
+   "question": "Is the establishment covered under the Employees' Provident Fund?",
+   "group": "Employees & labour"
+  },
+  "covered_esi": {
+   "scope": "company",
+   "label": "Covered under ESI",
+   "question": "Is the establishment covered under the Employees' State Insurance Act?",
+   "group": "Employees & labour"
+  },
+  "covered_lwf": {
+   "scope": "company",
+   "label": "Covered under Maharashtra LWF Act",
+   "question": "Is the establishment covered under the Maharashtra Labour Welfare Fund Act?",
+   "group": "Employees & labour"
+  },
+  "tax_audit": {
+   "scope": "company",
+   "label": "Tax audit threshold met",
+   "question": "Does turnover exceed the tax-audit limit (Rs.1 crore, or Rs.10 crore with cash transactions within 5%)?",
+   "group": "Tax & finance"
+  },
+  "gstr9_threshold": {
+   "scope": "company",
+   "label": "GSTR-9 threshold met",
+   "question": "Does aggregate turnover exceed Rs.2 crore (GSTR-9) or Rs.5 crore (GSTR-9C)?",
+   "group": "Tax & finance"
+  },
+  "msme_vendors": {
+   "scope": "company",
+   "label": "Pays registered MSME vendors",
+   "question": "Are any vendors/payees registered Micro or Small enterprises?",
+   "group": "Tax & finance"
+  },
+  "audit_committee": {
+   "scope": "company",
+   "label": "Audit Committee required",
+   "question": "Is the company required to constitute an Audit Committee (Section 177)?",
+   "group": "Company law & governance"
+  },
+  "nrc": {
+   "scope": "company",
+   "label": "Nomination & Remuneration Committee required",
+   "question": "Is the company required to constitute a Nomination & Remuneration Committee (Section 178)?",
+   "group": "Company law & governance"
+  },
+  "secretarial_audit": {
+   "scope": "company",
+   "label": "Secretarial Audit thresholds met",
+   "question": "Does the company meet the Secretarial Audit thresholds (Section 204)?",
+   "group": "Company law & governance"
+  },
+  "csr": {
+   "scope": "company",
+   "label": "CSR thresholds met",
+   "question": "Does the company meet the CSR thresholds (Section 135)?",
+   "group": "Company law & governance"
+  },
+  "sbo": {
+   "scope": "company",
+   "label": "Significant Beneficial Owners exist",
+   "question": "Do any individuals meet the Significant Beneficial Owner criteria?",
+   "group": "Company law & governance"
+  },
+  "fdi_construction": {
+   "scope": "company",
+   "label": "Foreign investment in construction-development",
+   "question": "Does the company accept/propose FDI in construction-development activity?",
+   "group": "Company law & governance"
+  },
+  "epc_abroad": {
+   "scope": "company",
+   "label": "EPC / turnkey projects abroad",
+   "question": "Does the company undertake EPC/turnkey/civil construction projects abroad?",
+   "group": "Company law & governance"
+  },
+  "has_exports": {
+   "scope": "company",
+   "label": "Has export transactions",
+   "question": "Does the company have export transactions?",
+   "group": "Tax & finance"
+  },
+  "export_advances": {
+   "scope": "company",
+   "label": "Receives advance against exports",
+   "question": "Is advance payment received against exports?",
+   "group": "Tax & finance"
+  },
+  "uses_cranes": {
+   "scope": "project",
+   "label": "Cranes / hoists / lifting appliances on site",
+   "question": "Are cranes, hoists or lifting appliances deployed at this site?",
+   "group": "Site & construction"
+  },
+  "extracts_groundwater": {
+   "scope": "project",
+   "label": "Extracts groundwater",
+   "question": "Does the project extract groundwater?",
+   "group": "Land, environment & approvals"
+  },
+  "cd_waste_high": {
+   "scope": "project",
+   "label": "C&D waste above threshold",
+   "question": "Will C&D waste exceed 20 tonnes/day or 300 tonnes/project/month?",
+   "group": "Site & construction"
+  },
+  "near_aerodrome_defence": {
+   "scope": "project",
+   "label": "Within aerodrome / defence funnel zone",
+   "question": "Does the site fall within a notified aerodrome or defence funnel zone needing height clearance?",
+   "group": "Land, environment & approvals"
+  },
+  "land_acquisition": {
+   "scope": "project",
+   "label": "Government acquisition of project land",
+   "question": "Has the Government initiated compulsory acquisition of this project's land?",
+   "group": "Land, environment & approvals"
+  },
+  "ec_threshold": {
+   "scope": "project",
+   "label": "Environmental Clearance threshold met",
+   "question": "Is built-up area 20,000 sq m or more, or site area 50 ha or more? (or enter the areas)",
+   "group": "Land, environment & approvals",
+   "derive": [
+    {
+     "scope": "project",
+     "field": "built_up_area_sqm",
+     "gte": 20000
+    },
+    {
+     "scope": "project",
+     "field": "site_area_ha",
+     "gte": 50
+    }
+   ]
+  },
+  "contract_labour": {
+   "scope": "project",
+   "label": "Contract labour engaged",
+   "question": "Is contract labour engaged through labour contractors on this project?",
+   "group": "Site & construction"
+  },
+  "contract_workers_20plus": {
+   "scope": "project",
+   "label": "20+ contract workers",
+   "question": "Are 20 or more contract workers engaged on this project? (or enter the count)",
+   "group": "Site & construction",
+   "derive": [
+    {
+     "scope": "project",
+     "field": "contract_workers_count",
+     "gte": 20
+    }
+   ]
+  },
+  "has_lift": {
+   "scope": "building",
+   "label": "Has a lift / escalator / moving walk",
+   "question": "Does this building have a lift, escalator or moving walk?",
+   "group": "Building"
+  },
+  "redevelopment_project": {
+   "scope": "project",
+   "label": "Redevelopment project",
+   "question": "Is this a redevelopment of an existing building or society (rather than a new development on vacant or acquired land)?",
+   "group": "Project type"
+  },
+  "redev_chs": {
+   "scope": "project",
+   "label": "Society-led redevelopment",
+   "question": "Is the redevelopment led by a co-operative housing society?",
+   "group": "Project type",
+   "requires": "redevelopment_project"
+  },
+  "redev_mhada": {
+   "scope": "project",
+   "label": "MHADA redevelopment",
+   "question": "Is this a MHADA cessed-building or MHADA-layout redevelopment?",
+   "group": "Project type",
+   "requires": "redevelopment_project"
+  },
+  "redev_sra": {
+   "scope": "project",
+   "label": "SRA slum rehabilitation",
+   "question": "Is this a slum rehabilitation (SRA) scheme?",
+   "group": "Project type",
+   "requires": "redevelopment_project"
+  },
+  "redev_tenanted": {
+   "scope": "project",
+   "label": "Tenanted / pagdi property",
+   "question": "Is this a redevelopment of privately owned tenanted or pagdi property?",
+   "group": "Project type",
+   "requires": "redevelopment_project"
+  },
+  "redev_cluster": {
+   "scope": "project",
+   "label": "Cluster redevelopment",
+   "question": "Is this a cluster / group redevelopment of several buildings or societies?",
+   "group": "Project type",
+   "requires": "redevelopment_project"
+  }
+ },
+ "item_flags": {
+  "MEP-001": [
+   "has_lift"
+  ],
+  "MEP-002": [
+   "has_lift"
+  ],
+  "MEP-003": [
+   "has_lift"
+  ],
+  "MEP-004": [
+   "has_lift"
+  ],
+  "MEP-005": [
+   "has_lift"
+  ],
+  "MEP-006": [
+   "has_lift"
+  ],
+  "MEP-007": [
+   "has_lift"
+  ],
+  "MEP-008": [
+   "has_lift"
+  ],
+  "ADM-003": [
+   "owns_vehicles"
+  ],
+  "ADM-004": [
+   "owns_vehicles"
+  ],
+  "ADM-005": [
+   "owns_vehicles"
+  ],
+  "ADM-006": [
+   "intl_travel"
+  ],
+  "HEA-002": [
+   "workers_500plus"
+  ],
+  "HEA-013": [
+   "uses_cranes"
+  ],
+  "HEA-014": [
+   "uses_cranes"
+  ],
+  "HEA-015": [
+   "uses_cranes"
+  ],
+  "HEA-016": [
+   "uses_cranes"
+  ],
+  "HEA-017": [
+   "uses_cranes"
+  ],
+  "EC-001": [
+   "ec_threshold"
+  ],
+  "EC-006": [
+   "extracts_groundwater"
+  ],
+  "EC-016": [
+   "cd_waste_high"
+  ],
+  "EC-017": [
+   "cd_waste_high"
+  ],
+  "EC-025": [
+   "cd_waste_high"
+  ],
+  "IT-009": [
+   "child_data"
+  ],
+  "IT-022": [
+   "processes_spdi"
+  ],
+  "IT-023": [
+   "processes_spdi"
+  ],
+  "IT-024": [
+   "processes_spdi"
+  ],
+  "IT-025": [
+   "processes_spdi"
+  ],
+  "IT-026": [
+   "discloses_spdi"
+  ],
+  "IT-027": [
+   "govt_requests_spdi"
+  ],
+  "IT-028": [
+   "transfers_spdi"
+  ],
+  "LAB-001": [
+   "employs_20plus"
+  ],
+  "LAB-002": [
+   "covered_epf"
+  ],
+  "LAB-003": [
+   "covered_epf"
+  ],
+  "LAB-005": [
+   "covered_epf"
+  ],
+  "LAB-004": [
+   "contract_labour",
+   "covered_epf"
+  ],
+  "LAB-006": [
+   "employs_10plus"
+  ],
+  "LAB-015": [
+   "employs_10plus"
+  ],
+  "LAB-039": [
+   "employs_10plus"
+  ],
+  "LAB-007": [
+   "covered_esi"
+  ],
+  "LAB-008": [
+   "covered_esi"
+  ],
+  "LAB-009": [
+   "covered_esi"
+  ],
+  "LAB-010": [
+   "covered_esi"
+  ],
+  "LAB-017": [
+   "employs_50plus"
+  ],
+  "LAB-025": [
+   "employs_5plus"
+  ],
+  "LAB-026": [
+   "covered_lwf"
+  ],
+  "LAB-027": [
+   "covered_lwf"
+  ],
+  "LAB-028": [
+   "covered_lwf"
+  ],
+  "FIN-004": [
+   "tax_audit"
+  ],
+  "FIN-009": [
+   "gstr9_threshold"
+  ],
+  "FIN-011": [
+   "msme_vendors"
+  ],
+  "SEC-009": [
+   "audit_committee"
+  ],
+  "SEC-010": [
+   "nrc"
+  ],
+  "SEC-014": [
+   "secretarial_audit"
+  ],
+  "SEC-015": [
+   "csr"
+  ],
+  "SEC-021": [
+   "sbo"
+  ],
+  "SEC-025": [
+   "fdi_construction"
+  ],
+  "SEC-026": [
+   "fdi_construction"
+  ],
+  "SEC-027": [
+   "epc_abroad"
+  ],
+  "SEC-028": [
+   "has_exports"
+  ],
+  "SEC-029": [
+   "export_advances"
+  ],
+  "HRL-029": [
+   "contract_labour"
+  ],
+  "HRL-030": [
+   "contract_workers_20plus"
+  ],
+  "HRL-031": [
+   "contract_workers_20plus"
+  ],
+  "SAN-003": [
+   "near_aerodrome_defence"
+  ],
+  "SAN-070": [
+   "land_acquisition"
+  ],
+  "CHK-001": [
+   "!redevelopment_project"
+  ],
+  "CHK-002": [
+   "!redevelopment_project"
+  ],
+  "CHK-003": [
+   "!redevelopment_project"
+  ],
+  "CHK-004": [
+   "!redevelopment_project"
+  ],
+  "CHK-005": [
+   "!redevelopment_project"
+  ],
+  "CHK-006": [
+   "!redevelopment_project"
+  ],
+  "CHK-007": [
+   "!redevelopment_project"
+  ],
+  "CHK-008": [
+   "!redevelopment_project"
+  ],
+  "CHK-009": [
+   "!redevelopment_project"
+  ],
+  "CHK-010": [
+   "!redevelopment_project"
+  ],
+  "CHK-011": [
+   "!redevelopment_project"
+  ],
+  "CHK-012": [
+   "!redevelopment_project"
+  ],
+  "CHK-013": [
+   "!redevelopment_project"
+  ],
+  "CHK-014": [
+   "!redevelopment_project"
+  ],
+  "CHK-015": [
+   "!redevelopment_project"
+  ],
+  "CHK-016": [
+   "!redevelopment_project"
+  ],
+  "CHK-017": [
+   "!redevelopment_project"
+  ],
+  "CHK-018": [
+   "!redevelopment_project"
+  ],
+  "CHK-019": [
+   "!redevelopment_project"
+  ],
+  "CHK-020": [
+   "!redevelopment_project"
+  ],
+  "CHK-021": [
+   "!redevelopment_project"
+  ],
+  "CHK-022": [
+   "!redevelopment_project"
+  ],
+  "CHK-023": [
+   "!redevelopment_project"
+  ],
+  "CHK-024": [
+   "!redevelopment_project"
+  ],
+  "CHK-025": [
+   "!redevelopment_project"
+  ],
+  "CHK-026": [
+   "!redevelopment_project"
+  ],
+  "CHK-027": [
+   "!redevelopment_project"
+  ],
+  "CHK-028": [
+   "!redevelopment_project"
+  ],
+  "CHK-029": [
+   "!redevelopment_project"
+  ],
+  "CHK-030": [
+   "!redevelopment_project"
+  ],
+  "CHK-031": [
+   "!redevelopment_project"
+  ],
+  "CHK-032": [
+   "!redevelopment_project"
+  ],
+  "CHK-033": [
+   "!redevelopment_project"
+  ],
+  "CHK-034": [
+   "!redevelopment_project"
+  ],
+  "CHK-035": [
+   "!redevelopment_project"
+  ],
+  "CHK-036": [
+   "!redevelopment_project"
+  ],
+  "CHK-037": [
+   "!redevelopment_project"
+  ],
+  "CHK-038": [
+   "!redevelopment_project"
+  ],
+  "CHK-039": [
+   "!redevelopment_project"
+  ],
+  "CHK-040": [
+   "!redevelopment_project"
+  ],
+  "CHK-041": [
+   "!redevelopment_project"
+  ],
+  "CHK-042": [
+   "!redevelopment_project"
+  ],
+  "CHK-043": [
+   "!redevelopment_project"
+  ],
+  "CHK-044": [
+   "!redevelopment_project"
+  ],
+  "CHK-045": [
+   "!redevelopment_project"
+  ],
+  "CHK-046": [
+   "!redevelopment_project"
+  ],
+  "CHK-047": [
+   "!redevelopment_project"
+  ],
+  "CHK-048": [
+   "!redevelopment_project"
+  ],
+  "CHK-049": [
+   "!redevelopment_project"
+  ],
+  "CHK-050": [
+   "!redevelopment_project"
+  ],
+  "CHK-051": [
+   "!redevelopment_project"
+  ],
+  "CHK-052": [
+   "!redevelopment_project"
+  ],
+  "CHK-053": [
+   "!redevelopment_project"
+  ],
+  "CHK-054": [
+   "!redevelopment_project"
+  ],
+  "CHK-055": [
+   "!redevelopment_project"
+  ],
+  "CHK-056": [
+   "!redevelopment_project"
+  ],
+  "CHK-057": [
+   "!redevelopment_project"
+  ],
+  "CHK-058": [
+   "!redevelopment_project"
+  ],
+  "CHK-059": [
+   "!redevelopment_project"
+  ],
+  "CHK-060": [
+   "!redevelopment_project"
+  ],
+  "CHK-061": [
+   "!redevelopment_project"
+  ],
+  "CHK-062": [
+   "!redevelopment_project"
+  ],
+  "CHK-063": [
+   "!redevelopment_project"
+  ],
+  "CHK-064": [
+   "!redevelopment_project"
+  ],
+  "CHK-065": [
+   "!redevelopment_project"
+  ],
+  "CHK-066": [
+   "!redevelopment_project"
+  ],
+  "CHK-067": [
+   "!redevelopment_project"
+  ],
+  "CHK-068": [
+   "!redevelopment_project"
+  ],
+  "CHK-069": [
+   "!redevelopment_project"
+  ],
+  "CHK-070": [
+   "!redevelopment_project"
+  ],
+  "CHK-071": [
+   "!redevelopment_project"
+  ],
+  "CHK-072": [
+   "!redevelopment_project"
+  ],
+  "CHK-073": [
+   "!redevelopment_project"
+  ],
+  "CHK-074": [
+   "!redevelopment_project"
+  ],
+  "CHK-075": [
+   "!redevelopment_project"
+  ],
+  "CHK-076": [
+   "!redevelopment_project"
+  ],
+  "CHK-077": [
+   "!redevelopment_project"
+  ],
+  "CHK-078": [
+   "!redevelopment_project"
+  ],
+  "CHK-079": [
+   "!redevelopment_project"
+  ],
+  "CHK-080": [
+   "!redevelopment_project"
+  ],
+  "CHK-081": [
+   "!redevelopment_project"
+  ],
+  "CHK-082": [
+   "!redevelopment_project"
+  ],
+  "CHK-083": [
+   "!redevelopment_project"
+  ],
+  "CHK-084": [
+   "!redevelopment_project"
+  ],
+  "CHK-085": [
+   "!redevelopment_project"
+  ],
+  "CHK-086": [
+   "!redevelopment_project"
+  ],
+  "CHK-087": [
+   "!redevelopment_project"
+  ],
+  "CHK-088": [
+   "!redevelopment_project"
+  ],
+  "CHK-089": [
+   "!redevelopment_project"
+  ],
+  "CHK-090": [
+   "!redevelopment_project"
+  ],
+  "CHK-091": [
+   "!redevelopment_project"
+  ],
+  "CHK-092": [
+   "!redevelopment_project"
+  ],
+  "CHK-093": [
+   "!redevelopment_project"
+  ],
+  "CHK-094": [
+   "!redevelopment_project"
+  ],
+  "CHK-095": [
+   "!redevelopment_project"
+  ],
+  "CHK-096": [
+   "redevelopment_project"
+  ],
+  "CHK-097": [
+   "redevelopment_project"
+  ],
+  "CHK-098": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-099": [
+   "redevelopment_project"
+  ],
+  "CHK-100": [
+   "redevelopment_project"
+  ],
+  "CHK-101": [
+   "redevelopment_project"
+  ],
+  "CHK-102": [
+   "redevelopment_project"
+  ],
+  "CHK-103": [
+   "redevelopment_project"
+  ],
+  "CHK-104": [
+   "redevelopment_project"
+  ],
+  "CHK-105": [
+   "redevelopment_project"
+  ],
+  "CHK-106": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-107": [
+   "redevelopment_project"
+  ],
+  "CHK-108": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-109": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-110": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-111": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-112": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-113": [
+   "redevelopment_project",
+   "redev_cluster"
+  ],
+  "CHK-114": [
+   "redevelopment_project",
+   "redev_mhada"
+  ],
+  "CHK-115": [
+   "redevelopment_project",
+   "redev_mhada"
+  ],
+  "CHK-116": [
+   "redevelopment_project",
+   "redev_sra"
+  ],
+  "CHK-117": [
+   "redevelopment_project",
+   "redev_tenanted"
+  ],
+  "CHK-118": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-119": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-120": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-121": [
+   "redevelopment_project"
+  ],
+  "CHK-122": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-123": [
+   "redevelopment_project"
+  ],
+  "CHK-124": [
+   "redevelopment_project"
+  ],
+  "CHK-125": [
+   "redevelopment_project"
+  ],
+  "CHK-126": [
+   "redevelopment_project"
+  ],
+  "CHK-127": [
+   "redevelopment_project"
+  ],
+  "CHK-128": [
+   "redevelopment_project"
+  ],
+  "CHK-129": [
+   "redevelopment_project"
+  ],
+  "CHK-130": [
+   "redevelopment_project"
+  ],
+  "CHK-131": [
+   "redevelopment_project"
+  ],
+  "CHK-132": [
+   "redevelopment_project"
+  ],
+  "CHK-133": [
+   "redevelopment_project"
+  ],
+  "CHK-134": [
+   "redevelopment_project"
+  ],
+  "CHK-135": [
+   "redevelopment_project"
+  ],
+  "CHK-136": [
+   "redevelopment_project"
+  ],
+  "CHK-137": [
+   "redevelopment_project"
+  ],
+  "CHK-138": [
+   "redevelopment_project"
+  ],
+  "CHK-139": [
+   "redevelopment_project"
+  ],
+  "CHK-140": [
+   "redevelopment_project"
+  ],
+  "CHK-141": [
+   "redevelopment_project"
+  ],
+  "CHK-142": [
+   "redevelopment_project"
+  ],
+  "CHK-143": [
+   "redevelopment_project"
+  ],
+  "CHK-144": [
+   "redevelopment_project"
+  ],
+  "CHK-145": [
+   "redevelopment_project"
+  ],
+  "CHK-146": [
+   "redevelopment_project"
+  ],
+  "CHK-147": [
+   "redevelopment_project"
+  ],
+  "CHK-148": [
+   "redevelopment_project"
+  ],
+  "CHK-149": [
+   "redevelopment_project"
+  ],
+  "CHK-150": [
+   "redevelopment_project"
+  ],
+  "CHK-151": [
+   "redevelopment_project"
+  ],
+  "CHK-152": [
+   "redevelopment_project"
+  ],
+  "CHK-153": [
+   "redevelopment_project"
+  ],
+  "CHK-154": [
+   "redevelopment_project"
+  ],
+  "CHK-155": [
+   "redevelopment_project"
+  ],
+  "CHK-156": [
+   "redevelopment_project"
+  ],
+  "CHK-157": [
+   "redevelopment_project"
+  ],
+  "CHK-158": [
+   "redevelopment_project"
+  ],
+  "CHK-159": [
+   "redevelopment_project"
+  ],
+  "CHK-160": [
+   "redevelopment_project"
+  ],
+  "CHK-161": [
+   "redevelopment_project"
+  ],
+  "CHK-162": [
+   "redevelopment_project"
+  ],
+  "CHK-163": [
+   "redevelopment_project"
+  ],
+  "CHK-164": [
+   "redevelopment_project"
+  ],
+  "CHK-165": [
+   "redevelopment_project"
+  ],
+  "CHK-166": [
+   "redevelopment_project"
+  ],
+  "CHK-167": [
+   "redevelopment_project"
+  ],
+  "CHK-168": [
+   "redevelopment_project"
+  ],
+  "CHK-169": [
+   "redevelopment_project"
+  ],
+  "CHK-170": [
+   "redevelopment_project"
+  ],
+  "CHK-171": [
+   "redevelopment_project"
+  ],
+  "CHK-172": [
+   "redevelopment_project"
+  ],
+  "CHK-173": [
+   "redevelopment_project"
+  ],
+  "CHK-174": [
+   "redevelopment_project"
+  ],
+  "CHK-175": [
+   "redevelopment_project"
+  ],
+  "CHK-176": [
+   "redevelopment_project"
+  ],
+  "CHK-177": [
+   "redevelopment_project"
+  ],
+  "CHK-178": [
+   "redevelopment_project"
+  ],
+  "CHK-179": [
+   "redevelopment_project"
+  ],
+  "CHK-180": [
+   "redevelopment_project"
+  ],
+  "CHK-181": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-182": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-183": [
+   "redevelopment_project"
+  ],
+  "CHK-184": [
+   "redevelopment_project"
+  ],
+  "CHK-185": [
+   "redevelopment_project"
+  ],
+  "CHK-186": [
+   "redevelopment_project"
+  ],
+  "CHK-187": [
+   "redevelopment_project"
+  ],
+  "CHK-188": [
+   "redevelopment_project"
+  ],
+  "CHK-189": [
+   "redevelopment_project"
+  ],
+  "CHK-190": [
+   "redevelopment_project"
+  ],
+  "CHK-191": [
+   "redevelopment_project"
+  ],
+  "CHK-192": [
+   "redevelopment_project"
+  ],
+  "CHK-193": [
+   "redevelopment_project"
+  ],
+  "CHK-194": [
+   "redevelopment_project"
+  ],
+  "CHK-195": [
+   "redevelopment_project"
+  ],
+  "CHK-196": [
+   "redevelopment_project"
+  ],
+  "CHK-197": [
+   "redevelopment_project"
+  ],
+  "CHK-198": [
+   "redevelopment_project"
+  ],
+  "CHK-199": [
+   "redevelopment_project"
+  ],
+  "CHK-200": [
+   "redevelopment_project"
+  ],
+  "CHK-201": [
+   "redevelopment_project"
+  ],
+  "CHK-202": [
+   "redevelopment_project",
+   "redev_chs"
+  ],
+  "CHK-203": [
+   "redevelopment_project"
+  ],
+  "CHK-204": [
+   "redevelopment_project"
+  ],
+  "CHK-205": [
+   "redevelopment_project"
+  ],
+  "CHK-206": [
+   "redevelopment_project"
+  ],
+  "CHK-207": [
+   "redevelopment_project"
+  ],
+  "CHK-208": [
+   "redevelopment_project"
+  ],
+  "CHK-209": [
+   "redevelopment_project"
+  ]
+ }
+}

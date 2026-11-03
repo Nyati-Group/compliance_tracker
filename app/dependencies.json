@@ -1,0 +1,27 @@
+{
+ "note": "PROPOSED prerequisites between compliance records: 'from' should be completed before 'to'. Each edge is drawn from the wording of the master register itself and is marked validated:false until the compliance head confirms it. Prerequisites are not a single chain; many records can run in parallel. Set an edge's validated to true after review, or delete it, or add new edges here.",
+ "edges": [
+  {"from": "SAN-015", "to": "SAN-016", "validated": false, "basis": "IOD sanction comes before the FSI sanction (order in the Sanctioning sheet)."},
+  {"from": "SAN-005", "to": "EC-001", "validated": false, "basis": "SAN-005 is named \"EC Fire NOC\": it is obtained for the Environmental Clearance application."},
+  {"from": "SAN-010", "to": "EC-001", "validated": false, "basis": "SAN-010 is named \"Provisional Water NOC for EC\"."},
+  {"from": "SAN-012", "to": "EC-001", "validated": false, "basis": "SAN-012 is named \"Provisional Drainage NOC for EC\"."},
+  {"from": "SAN-015", "to": "EC-001", "validated": false, "basis": "SAN-015 is named \"IOD Sanction for E.C. Purpose\"."},
+  {"from": "EC-001", "to": "EC-002", "validated": false, "basis": "EC-002: the Environmental Clearance must be published in the newspaper once obtained."},
+  {"from": "SAN-023", "to": "SAN-024", "validated": false, "basis": "Consent to Operate follows Consent to Establish."},
+  {"from": "SAN-023", "to": "SAN-018", "validated": false, "basis": "EC-003: Consent to Establish must be taken before construction activity starts; plinth checking is construction-stage."},
+  {"from": "SAN-009", "to": "SAN-026", "validated": false, "basis": "The final Garden NOC is needed before the Occupancy Certificate."},
+  {"from": "SAN-011", "to": "SAN-026", "validated": false, "basis": "The final Water NOC is needed before the Occupancy Certificate."},
+  {"from": "SAN-013", "to": "SAN-026", "validated": false, "basis": "The final Drainage NOC is needed before the Occupancy Certificate."},
+  {"from": "SAN-024", "to": "SAN-026", "validated": false, "basis": "EC-004: Consent to Operate is taken before or at the time of the Occupancy Certificate."},
+  {"from": "SAN-033", "to": "SAN-034", "validated": false, "basis": "Money can only be withdrawn from the separate 70% account once it exists."},
+  {"from": "SAN-029", "to": "SAN-037", "validated": false, "basis": "The project web page exists only for a registered project."},
+  {"from": "SAN-029", "to": "SAN-038", "validated": false, "basis": "Quarterly updates are due only once the project is registered."},
+  {"from": "SAN-029", "to": "SAN-039", "validated": false, "basis": "Advertisements must carry the registration number, which is issued on registration."},
+  {"from": "SAN-049", "to": "SAN-050", "validated": false, "basis": "Common areas are handed to the association, so the association must be formed first."},
+  {"from": "SAN-049", "to": "SAN-051", "validated": false, "basis": "The conveyance is executed in favour of the association (or allottee); the association must exist."},
+  {"from": "SAN-026", "to": "SAN-050", "validated": false, "basis": "Possession of common areas is handed over after the Occupancy Certificate."},
+  {"from": "SAN-021", "to": "SAN-022", "validated": false, "basis": "TDR utilisation comes before the TDR-linked premium and ancillary FSI sanction."},
+  {"from": "MEP-001", "to": "MEP-002", "validated": false, "basis": "Permission to erect a lift comes before the completion notice and licence."},
+  {"from": "HRL-030", "to": "HRL-029", "validated": false, "basis": "The Principal Employer registration is obtained before contract labour is engaged."}
+ ]
+}

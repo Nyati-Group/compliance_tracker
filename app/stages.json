@@ -1,47 +1,87 @@
 [
  {
+  "id": "S0",
+  "order": 0,
+  "name": "Stage 0 – Company & Project Applicability Setup",
+  "description": "Record the company, project, location, type, phase, buildings and construction status, then decide which compliance requirements apply. Driven by project setup, not by master records.",
+  "prerequisites": []
+ },
+ {
   "id": "S1",
-  "name": "Stage 1 \u2013 Land & Legal Due Diligence",
-  "order": 1
+  "order": 1,
+  "name": "Stage 1 – Land & Legal Due Diligence",
+  "description": "Land title, ownership, development rights, legal agreements, land records, land-use permissions and zoning.",
+  "prerequisites": [
+   "S0"
+  ]
  },
  {
   "id": "S2",
-  "name": "Stage 2 \u2013 Design & Architecture Approval",
-  "order": 2
+  "order": 2,
+  "name": "Stage 2 – Planning & Development Approvals",
+  "description": "Master layout, layout approval, development permission, building plan approval, FSI-related planning approvals and applicable development regulations.",
+  "prerequisites": [
+   "S1"
+  ]
  },
  {
   "id": "S3",
-  "name": "Stage 3 \u2013 NOCs (Fire / Garden / Water / Drainage / Power)",
-  "order": 3
+  "order": 3,
+  "name": "Stage 3 – Statutory NOCs & Infrastructure Permissions",
+  "description": "Fire, water, drainage, electricity, infrastructure, garden/amenity and other statutory NOCs.",
+  "prerequisites": [
+   "S2"
+  ]
  },
  {
   "id": "S4",
-  "name": "Stage 4 \u2013 IOD & FSI Sanctions",
-  "order": 4
+  "order": 4,
+  "name": "Stage 4 – IOD, Sanctions & Commencement",
+  "description": "IOD, FSI sanctions, building permissions, Commencement Certificate, approval amendments, authority conditions, and RERA registration (required before any marketing or sale).",
+  "prerequisites": [
+   "S2"
+  ]
  },
  {
   "id": "S5",
-  "name": "Stage 5 \u2013 Construction-Stage Checks & TDR",
-  "order": 5
+  "order": 5,
+  "name": "Stage 5 – Pre-Construction & Construction Compliance",
+  "description": "Labour, contractor and site safety compliance, inspections, construction permissions and records, TDR-related requirements and activity-based obligations.",
+  "prerequisites": [
+   "S4"
+  ]
  },
  {
   "id": "S6",
-  "name": "Stage 6 \u2013 Environmental Clearance (CTE/CTO) & Swachh NOC",
-  "order": 6
+  "order": 6,
+  "name": "Stage 6 – Environmental & Operational Permissions",
+  "description": "Environmental clearance, Consent to Establish and Operate, waste management, water and wastewater permissions, environmental conditions and Swachh-related permissions.",
+  "prerequisites": [
+   "S2"
+  ]
  },
  {
   "id": "S7",
-  "name": "Stage 7 \u2013 Occupancy & Handover to Sales",
-  "order": 7
+  "order": 7,
+  "name": "Stage 7 – Completion, Occupancy & Handover",
+  "description": "Completion and occupancy approvals, final inspections, possession, handover, society-related documentation and final certificates.",
+  "prerequisites": [
+   "S5",
+   "S6"
+  ]
  },
  {
   "id": "S8",
-  "name": "Stage 8 \u2013 RERA Registration & Ongoing Project Obligations",
-  "order": 8
+  "order": 8,
+  "name": "Stage 8 – RERA & Ongoing Obligations",
+  "description": "Continuing statutory compliance: RERA reporting and disclosures, project amendments, renewals, post-completion duties, and recurring company-wide obligations (labour, tax, corporate, data protection).",
+  "prerequisites": []
  },
  {
   "id": "UNMAPPED",
+  "order": 99,
   "name": "Unmapped to Stage",
-  "order": 99
+  "description": "Needs a reviewer to assign a stage.",
+  "prerequisites": []
  }
 ]

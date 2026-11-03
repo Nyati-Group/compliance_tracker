@@ -1,0 +1,682 @@
+{
+ "note": "Suggested risk levels read from the register's own penalty wording. Not a legal classification and never used in scoring until a person accepts them.",
+ "generated_at": "2026-10-28T10:40:22.271Z",
+ "proposals": {
+  "MEP-001": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-002": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-004": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-006": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-007": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-008": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "ADM-001": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "MEP-009": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-010": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MEP-011": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "ADM-002": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "ADM-003": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "ADM-004": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "ADM-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "ADM-006": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "HEA-009": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HEA-015": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HEA-016": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HEA-017": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HEA-018": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "HEA-019": {
+   "level": "critical",
+   "basis": "The penalty wording mentions both prosecution/imprisonment and stop-work, closure or revocation."
+  },
+  "HEA-021": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "HEA-022": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "HEA-023": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "EC-007": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "EC-008": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "EC-009": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "EC-012": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "EC-014": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "EC-015": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "EC-018": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "EC-019": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "EC-020": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "EC-022": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "EC-023": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-001": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-002": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-004": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-006": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-008": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-010": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-011": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-012": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-013": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-014": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-019": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-020": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-021": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "IT-030": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "LAB-001": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-002": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-005": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "LAB-006": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-007": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-008": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-009": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-010": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-011": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-012": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-013": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-014": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-015": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-016": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-017": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-018": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-019": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "LAB-020": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-021": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-022": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-023": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-024": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-025": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-026": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-027": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-028": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-029": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "LAB-030": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "LAB-031": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-032": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LAB-038": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-001": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-002": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-006": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-007": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-008": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-009": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-011": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "FIN-001": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "FIN-002": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "FIN-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "FIN-004": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "FIN-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "FIN-006": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "FIN-010": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-001": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-004": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-006": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-007": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-008": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-009": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "SEC-010": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-011": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-012": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-013": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-014": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-015": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-016": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-018": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-019": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "SEC-020": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "SEC-023": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-024": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SEC-026": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "SEC-027": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "SEC-028": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LEG-001": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "LEG-003": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LEG-004": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LEG-005": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LEG-006": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-012": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-013": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "MAR-014": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "FIN-012": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "LEG-007": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HRL-013": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "HRL-016": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HRL-025": {
+   "level": "high",
+   "basis": "The penalty wording mentions stop-work, closure, revocation or cancellation."
+  },
+  "HRL-027": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "HRL-030": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "HRL-031": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "SAN-029": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "SAN-030": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-031": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-032": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-033": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-034": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-035": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-036": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-037": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-038": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-039": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-040": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-041": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-042": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-043": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-044": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-045": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-046": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-048": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-049": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-050": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-051": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-052": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-053": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-054": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-055": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-057": {
+   "level": "medium",
+   "basis": "The penalty wording mentions a fine, penalty, interest or compensation only."
+  },
+  "SAN-060": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  },
+  "SAN-066": {
+   "level": "high",
+   "basis": "The penalty wording mentions prosecution or imprisonment."
+  }
+ }
+}
