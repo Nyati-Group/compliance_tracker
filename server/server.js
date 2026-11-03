@@ -16,7 +16,7 @@ import { loadShared, healthOf, publicHealth, saveSnapshot, previousSnapshot, tre
 import { buildRecommendations, DEFAULT_HEALTH, mergeSettings as mergeHealthSettings } from './health.mjs';
 import { registerRegulatory, ensureIndexes as ensureRegulatoryIndexes } from './regulatory-routes.mjs';
 import { registerDocStudio } from './docstudio-routes.mjs';
-import { startScheduler as startRegulatoryScheduler } from './regulatory.mjs';
+import { startScheduler as startRegulatoryScheduler, runMonitoring as runRegulatoryMonitoring } from './regulatory.mjs';
 import { initKnowledge, retrieve, trackingContext, buildContext, extractSources, askModel, askGemini, rewriteQueries } from './chat.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -154,6 +154,7 @@ const publicUser = (u) => ({
 
 /* ----------------------------- app ----------------------------- */
 const app = express();
+export default app;
 app.disable('x-powered-by');
 if (TRUST_PROXY) app.set('trust proxy', /^\d+$/.test(TRUST_PROXY) ? Number(TRUST_PROXY) : TRUST_PROXY);
 
@@ -242,6 +243,18 @@ app.use('/images', express.static(imagesDir, {
   setHeaders: (res, p) => { if (p.endsWith('.avif')) res.setHeader('Content-Type', 'image/avif'); }
 }));
 app.get('/login.html', (req, res) => res.sendFile(path.join(appDir, 'login.html')));
+
+// Public, but guarded by a shared secret instead of a session: the daily reminder/health/regulatory
+// run, for a scheduler with no session of its own (e.g. Vercel Cron — see vercel.json). `cronDailyDeps.run`
+// is filled in further down, once everything it needs exists; the route itself only runs on a real request,
+// by which time module setup has finished, so the forward reference is safe.
+const cronDailyDeps = {};
+app.all('/api/cron/daily', async (req, res) => {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || req.headers.authorization !== `Bearer ${secret}`) return res.status(404).json({ error: 'not found' });
+  try { await cronDailyDeps.run(); res.json({ ok: true }); }
+  catch (e) { console.error('Cron run failed:', e); res.status(500).json({ error: 'cron run failed' }); }
+});
 
 // Everything below needs a signed-in user.
 app.use((req, res, next) => {
@@ -920,6 +933,31 @@ app.delete('/files/:id', requireCap('upload_docs'), withScopes, async (req, res)
   } catch (e) { console.error(e); res.status(500).json({ error: 'delete failed' }); }
 });
 
+// Deadline reminders and document-expiry notices, plus health scores and the regulatory feed.
+// On a traditional host this runs itself on a timer; on serverless (no long-lived process) it
+// only runs when something calls it, so Vercel Cron hits /api/cron/daily instead (see vercel.json
+// and the public route registered above, before the signed-in gate).
+const runReminderCheck = () => runReminders(db)
+  .then((r) => { if (!r.skipped) console.log(`Reminders checked ${r.checked} records; new notices: ${JSON.stringify(r.made)}`); })
+  .then(() => runAll(db)).then((r) => console.log(`Health scores and snapshots refreshed for ${r.scopes} project/company views.`))
+  .then(() => autoAnalyse(db, aiConfig())).then((n) => { if (n) console.log(`AI analysis refreshed automatically for ${n} project(s).`); })
+  .catch((e) => console.error('Reminder / health refresh failed:', e.message));
+
+ensureRegulatoryIndexes(db).catch((e) => console.error('Regulatory indexes:', e.message));
+docStudio.ensureIndexes().catch((e) => console.error('Document indexes:', e.message));
+
+// Documents already on file are passed on to the later records that need them (copies already made are skipped).
+const runCarryForward = () => carryAllExisting(db, bucket)
+  .then((n) => { if (n) { console.log(`Documents carried forward to later records: ${n}.`); touchAllSoon(); } })
+  .catch((e) => console.error('Carry-forward failed:', e.message));
+cronDailyDeps.run = async () => {
+  await runReminderCheck();
+  if (process.env.REGULATORY_MONITORING !== 'off') {
+    const r = await runRegulatoryMonitoring(db, regulatory.deps(), { trigger: 'scheduled' });
+    if (!r.skipped) console.log(`Regulatory monitoring finished: ${r.run.totals.new} new, ${r.run.totals.modified} changed, ${r.run.totals.failed} source problem(s).`);
+  }
+};
+
 /* ----------------------------- static app (signed-in only) ----------------------------- */
 app.use(express.static(appDir, {
   setHeaders: (res, p) => {
@@ -933,25 +971,20 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.status && err.status < 500 ? err.message : 'server error' });
 });
 
-const server = app.listen(PORT, () => console.log(`Compliance Tracker running on port ${PORT}${PROD ? ' (production)' : ''}`));
+if (process.env.VERCEL) {
+  // Serverless: no persistent process to run deferred/interval work, so do the one-time setup now.
+  await runCarryForward();
+} else {
+  const server = app.listen(PORT, () => console.log(`Compliance Tracker running on port ${PORT}${PROD ? ' (production)' : ''}`));
 
-// Deadline reminders and document-expiry notices: once shortly after start, then every 6 hours. Each notice is created only once.
-const runReminderCheck = () => runReminders(db)
-  .then((r) => { if (!r.skipped) console.log(`Reminders checked ${r.checked} records; new notices: ${JSON.stringify(r.made)}`); })
-  .then(() => runAll(db)).then((r) => console.log(`Health scores and snapshots refreshed for ${r.scopes} project/company views.`))
-  .then(() => autoAnalyse(db, aiConfig())).then((n) => { if (n) console.log(`AI analysis refreshed automatically for ${n} project(s).`); })
-  .catch((e) => console.error('Reminder / health refresh failed:', e.message));
-setTimeout(runReminderCheck, 20_000).unref();
-setInterval(runReminderCheck, 6 * 60 * 60 * 1000).unref();
+  setTimeout(runReminderCheck, 20_000).unref();
+  setInterval(runReminderCheck, 6 * 60 * 60 * 1000).unref();
+  setTimeout(runCarryForward, 30_000).unref();
+  // Regulatory monitoring: every day at 08:00 IST, in the backend, with the dashboard closed. Admins can also run it from Settings.
+  if (process.env.REGULATORY_MONITORING !== 'off') startRegulatoryScheduler(db, regulatory.deps());
 
-// Regulatory monitoring: every day at 08:00 IST, in the backend, with the dashboard closed. Admins can also run it from Settings.
-ensureRegulatoryIndexes(db).catch((e) => console.error('Regulatory indexes:', e.message));
-docStudio.ensureIndexes().catch((e) => console.error('Document indexes:', e.message));
-// Documents already on file are passed on to the later records that need them (copies already made are skipped).
-setTimeout(() => carryAllExisting(db, bucket).then((n) => { if (n) { console.log(`Documents carried forward to later records: ${n}.`); touchAllSoon(); } }).catch((e) => console.error('Carry-forward failed:', e.message)), 30_000).unref();
-if (process.env.REGULATORY_MONITORING !== 'off') startRegulatoryScheduler(db, regulatory.deps());
-
-for (const sig of ['SIGTERM', 'SIGINT']) {
-  process.on(sig, () => server.close(async () => { await client.close(); process.exit(0); }));
+  for (const sig of ['SIGTERM', 'SIGINT']) {
+    process.on(sig, () => server.close(async () => { await client.close(); process.exit(0); }));
+  }
 }
 

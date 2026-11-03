@@ -54,6 +54,28 @@ A `Dockerfile` is included at the repo root.
 5. Health check path: `/healthz`.
 6. Turn on Atlas backups.
 
+### Deploying to Vercel instead
+
+The app also runs on Vercel as a single serverless function (`api/index.mjs`, routed to by
+`vercel.json`) instead of the long-running `node server.js` process above. Everything in
+`app/`, `server/`, `images/` and `knowledge/` is bundled into that one function.
+
+1. Import the repo in Vercel. A root `package.json`/`package-lock.json` is included so Vercel's
+   build installs the same dependencies as `server/package.json`.
+2. Set the same environment variables as above, plus `CRON_SECRET` (any long random string) —
+   it guards the `/api/cron/daily` route that Vercel Cron calls instead of the in-process timers.
+3. `vercel.json` schedules that cron for 02:30 UTC (08:00 IST) daily. **On the Hobby plan, Vercel
+   allows at most daily cron runs**, so reminder/health checks move from every 6 hours to once a
+   day; add more entries to `crons` (Pro plan) for the original cadence.
+4. **Document uploads are capped at ~4.5 MB on Vercel**, regardless of the app's own 15 MB limit
+   (`server/server.js`'s `MAX_UPLOAD`) — this is a hard platform limit on serverless function
+   request bodies, not something `vercel.json` can raise. Uploads between 4.5–15 MB will fail
+   with a 413 until this is addressed (e.g. a smaller limit, or a direct-to-storage upload flow).
+5. Default function timeout is 60s (`maxDuration` in `vercel.json`); raise it (Pro plan, up to
+   300s) if AI chat or document analysis calls are timing out.
+6. Vercel's filesystem is read-only/ephemeral, but this app already stores uploads in MongoDB
+   GridFS and has no other writes to local disk at request time, so this isn't a concern.
+
 ## Contents
 
 - `app/index.html` — the single-page app (dashboard, stages, calendar, register,
