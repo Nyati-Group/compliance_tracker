@@ -36,14 +36,15 @@ const CHAT_PROVIDER = GEMINI_API_KEY ? 'gemini' : ANTHROPIC_API_KEY ? 'anthropic
 const CHAT_MODEL = CHAT_PROVIDER === 'gemini' ? GEMINI_MODEL : ANTHROPIC_MODEL;
 const PROD = NODE_ENV === 'production';
 
-if (!MONGODB_URI) {
-  console.error('MONGODB_URI is missing. Copy server/.env.example to server/.env and fill it in.');
+// A setting the server cannot start without. On a normal host: log and stop. On Vercel: throw, so api/index.mjs can
+// answer every request with what is missing (the name of the setting only, never a value).
+function fatal(message) {
+  if (process.env.VERCEL) throw Object.assign(new Error(message), { startup: true });
+  console.error(message);
   process.exit(1);
 }
-if (PROD && (!SESSION_SECRET || SESSION_SECRET.length < 32)) {
-  console.error('SESSION_SECRET (at least 32 characters) is required when NODE_ENV=production.');
-  process.exit(1);
-}
+if (!MONGODB_URI) fatal('MONGODB_URI is missing. Copy server/.env.example to server/.env and fill it in (on Vercel: Project Settings → Environment Variables).');
+if (PROD && (!SESSION_SECRET || SESSION_SECRET.length < 32)) fatal('SESSION_SECRET (at least 32 characters) is required when NODE_ENV=production.');
 const SECRET = SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 if (!SESSION_SECRET) console.warn('SESSION_SECRET not set: using a random one, so everyone is signed out on each restart.');
 
@@ -68,7 +69,8 @@ const MIN_PASSWORD = 10;
 
 /* ----------------------------- database ----------------------------- */
 const client = new MongoClient(MONGODB_URI);
-await client.connect();
+try { await client.connect(); }
+catch (e) { console.error('MongoDB connection failed:', e.message); fatal('Could not connect to MongoDB. Check MONGODB_URI, and that Atlas Network Access allows this host (Vercel has no fixed IP: allow 0.0.0.0/0).'); }
 const db = client.db(MONGODB_DB);
 const users = db.collection('users');
 await db.collection('audit').createIndex({ key: 1, at: -1 });
