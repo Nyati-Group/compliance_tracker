@@ -7,7 +7,9 @@ try {
   app = (await import('../server/server.js')).default;
 } catch (e) {
   console.error('Server start-up failed:', e);
-  const error = e.startup ? `The server could not start: ${e.message}` : 'The server could not start. See the function logs in Vercel.';
+  // Anything that looks like a connection string is removed from the message before it is shown.
+  const detail = String(e && (e.code ? `${e.code}: ` : '') + (e && e.message)).replace(/mongodb(\+srv)?:\/\/\S+/gi, '[database address]').slice(0, 400);
+  const error = e.startup ? `The server could not start: ${e.message}` : `The server could not start (${detail}). See the function logs in Vercel.`;
   app = (req, res) => { res.statusCode = 500; res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify({ error })); };
 }
 
