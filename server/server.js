@@ -1,6 +1,4 @@
-import express from 'express';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+import { createApp, jsonBody, rawBody, rateLimit, securityHeaders, serveStatic, getCookie } from './http.mjs';
 import { MongoClient, GridFSBucket, ObjectId } from 'mongodb';
 import crypto from 'node:crypto';
 import { promisify } from 'node:util';
@@ -20,7 +18,8 @@ import { startScheduler as startRegulatoryScheduler, runMonitoring as runRegulat
 import { initKnowledge, retrieve, trackingContext, buildContext, extractSources, askModel, askGemini, rewriteQueries } from './chat.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const appDir = path.join(here, '..', 'app');
+const sharedDir = path.join(here, '..', 'shared');           // register data + core.js, shared with the browser app
+const clientDir = path.join(here, '..', 'client', 'dist');   // the built React app (npm run build)
 const imagesDir = path.join(here, '..', 'images');
 const knowledgeDir = path.join(here, '..', 'knowledge');
 const envFile = path.join(here, '.env');
@@ -114,13 +113,6 @@ function readToken(token) {
     return d.x > Date.now() ? d : null;
   } catch { return null; }
 }
-function getCookie(req, name) {
-  for (const part of String(req.headers.cookie || '').split(';')) {
-    const i = part.indexOf('=');
-    if (i > 0 && part.slice(0, i).trim() === name) return decodeURIComponent(part.slice(i + 1).trim());
-  }
-  return null;
-}
 const cookieOpts = { httpOnly: true, sameSite: 'strict', secure: PROD, maxAge: SESSION_MS, path: '/' };
 
 /* First run: create the admin from ADMIN_EMAIL / ADMIN_PASSWORD when there are no users. */
@@ -153,28 +145,25 @@ const publicUser = (u) => ({
 });
 
 /* ----------------------------- app ----------------------------- */
-const app = express();
+const app = createApp();
 export default app;
-app.disable('x-powered-by');
-if (TRUST_PROXY) app.set('trust proxy', /^\d+$/.test(TRUST_PROXY) ? Number(TRUST_PROXY) : TRUST_PROXY);
+if (TRUST_PROXY) app.set('trustProxy', TRUST_PROXY);
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: false,
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:'],
-      connectSrc: ["'self'"],
-      frameAncestors: ["'none'"],
-      formAction: ["'self'"],
-      baseUri: ["'self'"],
-      objectSrc: ["'none'"]
-    }
+app.use(securityHeaders({
+  csp: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    imgSrc: ["'self'", 'data:', 'blob:'],
+    connectSrc: ["'self'"],
+    frameSrc: ["'self'", 'blob:'],
+    frameAncestors: ["'none'"],
+    formAction: ["'self'"],
+    baseUri: ["'self'"],
+    objectSrc: ["'none'"]
   },
-  hsts: PROD ? undefined : false
+  hsts: PROD
 }));
 
 app.get('/healthz', async (req, res) => {
@@ -182,7 +171,7 @@ app.get('/healthz', async (req, res) => {
   catch { res.status(503).json({ ok: false }); }
 });
 
-app.use(express.json({ limit: '100kb' }));
+app.use(jsonBody({ limit: 100 * 1024 }));
 
 // CSRF defence in depth (cookie is SameSite=Strict): writes must be JSON and same-origin.
 app.use((req, res, next) => {
@@ -204,7 +193,7 @@ app.use((req, res, next) => {
 
 /* ----------------------------- auth ----------------------------- */
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false,
+  windowMs: 15 * 60 * 1000, limit: 10,
   message: { error: 'Too many attempts. Try again in a few minutes.' }
 });
 
@@ -238,11 +227,11 @@ app.use(async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Public: login page and logo only.
-app.use('/images', express.static(imagesDir, {
-  setHeaders: (res, p) => { if (p.endsWith('.avif')) res.setHeader('Content-Type', 'image/avif'); }
-}));
-app.get('/login.html', (req, res) => res.sendFile(path.join(appDir, 'login.html')));
+// Public: the login page, the logo and the built scripts/styles (content-hashed, so cached for good).
+const noCache = { 'Cache-Control': 'no-cache' };
+app.use(serveStatic(imagesDir, { prefix: '/images' }));
+app.use(serveStatic(path.join(clientDir, 'assets'), { prefix: '/assets', headers: () => ({ 'Cache-Control': 'public, max-age=31536000, immutable' }) }));
+app.get('/login.html', (req, res) => res.sendFile(path.join(clientDir, 'login.html'), noCache));
 
 // Public, but guarded by a shared secret instead of a session: the daily reminder/health/regulatory
 // run, for a scheduler with no session of its own (e.g. Vercel Cron — see vercel.json). `cronDailyDeps.run`
@@ -356,11 +345,11 @@ app.put('/auth/users/:email', requireCap('manage_users'), async (req, res) => {
 const chatPrompt = fs.readFileSync(path.join(here, 'chat-prompt.txt'), 'utf8');
 const chatLogs = db.collection('chat_logs');
 await chatLogs.createIndex({ at: -1 });
-initKnowledge(appDir, knowledgeDir, () => aiConfig()).catch((e) => console.error('Ask AI knowledge load failed:', e));
+initKnowledge(sharedDir, knowledgeDir, () => aiConfig()).catch((e) => console.error('Ask AI knowledge load failed:', e));
 
 const chatLimiter = rateLimit({
-  windowMs: 60 * 1000, limit: 12, standardHeaders: true, legacyHeaders: false,
-  keyGenerator: (req) => String(req.user._id),
+  windowMs: 60 * 1000, limit: 12,
+  key: (req) => req.user._id,
   message: { error: 'Too many questions in a minute. Please wait a moment.' }
 });
 
@@ -475,7 +464,7 @@ app.post('/api/chat/feedback', async (req, res) => {
 });
 
 /* ----------------------------- project compliance intelligence ----------------------------- */
-const itemIds = new Set(JSON.parse(fs.readFileSync(path.join(appDir, 'items.json'), 'utf8')).map((i) => i.compliance_id));
+const itemIds = new Set(JSON.parse(fs.readFileSync(path.join(sharedDir, 'items.json'), 'utf8')).map((i) => i.compliance_id));
 const aiConfig = () => (CHAT_PROVIDER ? { provider: CHAT_PROVIDER, apiKey: CHAT_PROVIDER === 'gemini' ? GEMINI_API_KEY : ANTHROPIC_API_KEY, model: CHAT_MODEL, fallbackModel: CHAT_PROVIDER === 'gemini' ? GEMINI_FALLBACK_MODEL : null } : null);
 
 // A tracking/document key ends in a company, project, phase or building id; find the project or company view it belongs to.
@@ -633,7 +622,7 @@ app.get('/api/intel/portfolio', withScopes, async (req, res) => {
 app.post('/api/risk/accept-suggestions', requireCap('decide_applicability'), withScopes, async (req, res) => {
   try {
     if (!req.allowed.all) return res.status(403).json({ error: 'Only an unrestricted account can classify risk for the whole register.' });
-    const proposals = (JSON.parse(fs.readFileSync(path.join(appDir, 'risk-proposals.json'), 'utf8')).proposals) || {};
+    const proposals = (JSON.parse(fs.readFileSync(path.join(sharedDir, 'risk-proposals.json'), 'utf8')).proposals) || {};
     const have = new Set((await db.collection('risk_overrides').find({}, { projection: { _id: 1 } }).toArray()).map((d) => String(d._id)));
     const now = new Date().toISOString(), ops = [];
     for (const [cid, p] of Object.entries(proposals)) if (!have.has(cid) && itemIds.has(cid)) ops.push({ insertOne: { document: { _id: cid, level: p.level, source: 'suggested', reason: p.basis, set_by: req.user.name, at: now } } });
@@ -683,8 +672,8 @@ app.post('/api/notifications/run', requireCap('manage_settings'), async (req, re
 });
 
 /* ----------------------------- regulatory updates ----------------------------- */
-const itemsList = JSON.parse(fs.readFileSync(path.join(appDir, 'items.json'), 'utf8'));
-const regulatory = registerRegulatory(app, { db, bucket, requireCap, withScopes, aiConfig, items: itemsList, appDir });
+const itemsList = JSON.parse(fs.readFileSync(path.join(sharedDir, 'items.json'), 'utf8'));
+const regulatory = registerRegulatory(app, { db, bucket, requireCap, withScopes, aiConfig, items: itemsList, appDir: sharedDir });
 const docStudio = registerDocStudio(app, { db, bucket, requireCap, withScopes, aiConfig, attach: (...a) => attachPrepared(...a) });
 
 /* ----------------------------- data API ----------------------------- */
@@ -856,7 +845,7 @@ async function attachPrepared(req, a, buffer, fileName, generatedId) {
 }
 
 // Uploading the same document name again creates a new version; older versions stay on record.
-app.post('/files', requireCap('upload_docs'), withScopes, express.raw({ type: () => true, limit: MAX_UPLOAD }), async (req, res) => {
+app.post('/files', requireCap('upload_docs'), withScopes, rawBody({ limit: MAX_UPLOAD, tooLarge: 'File is larger than 15 MB.' }), async (req, res) => {
   try {
     const { key, compliance_id, project_id, doc_name, file_name, issue_date, expiry_date } = req.query;
     const meta = {
@@ -872,10 +861,7 @@ app.post('/files', requireCap('upload_docs'), withScopes, express.raw({ type: ()
     if (issue && expiry && expiry < issue) return res.status(400).json({ error: 'The expiry date is before the issue date.' });
     const saved = await saveDocument(meta, req.body, req.user, { issue, expiry });
     res.json({ ok: true, id: saved.id, version: saved.version, carried: saved.carried });
-  } catch (e) {
-    if (e.type === 'entity.too.large') return res.status(413).json({ error: 'File is larger than 15 MB.' });
-    console.error(e); res.status(500).json({ error: 'upload failed' });
-  }
+  } catch (e) { console.error(e); res.status(500).json({ error: 'upload failed' }); }
 });
 
 app.get('/files/:fileId', withScopes, async (req, res) => {
@@ -958,12 +944,11 @@ cronDailyDeps.run = async () => {
   }
 };
 
-/* ----------------------------- static app (signed-in only) ----------------------------- */
-app.use(express.static(appDir, {
-  setHeaders: (res, p) => {
-    if (p.endsWith('.html')) { res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-cache'); }
-  }
-}));
+/* ----------------------------- app shell and register data (signed-in only) ----------------------------- */
+app.use(serveStatic(sharedDir, { prefix: '/data', headers: () => noCache }));
+app.get('/', (req, res) => res.sendFile(path.join(clientDir, 'index.html'), noCache));
+// On Vercel the built pages are served by its CDN (vercel.json outputDirectory), so only the API reaches this function.
+if (!process.env.VERCEL && !fs.existsSync(path.join(clientDir, 'index.html'))) console.warn('client/dist is missing: run "npm run build" (or use "npm run dev", which serves the app through Vite).');
 
 app.use((err, req, res, next) => {
   console.error(err);

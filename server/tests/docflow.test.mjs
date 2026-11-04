@@ -19,7 +19,7 @@ test('documents issued by an authority or another party are "received"', () => {
 });
 test('empty or placeholder names are received (nothing to prepare)', () => { for (const n of ['', '-', 'NA', 'Documents', null]) assert.equal(origin(n), 'received'); });
 test('every document named in the register gets an origin', () => {
-  const items = JSON.parse(fs.readFileSync(new URL('../../app/items.json', import.meta.url), 'utf8'));
+  const items = JSON.parse(fs.readFileSync(new URL('../../shared/items.json', import.meta.url), 'utf8'));
   const names = new Set(); for (const i of items) for (const n of Core.requiredDocs(i)) names.add(n);
   assert.ok(names.size > 300);
   const prepared = [...names].filter((n) => origin(n) === 'prepared').length;

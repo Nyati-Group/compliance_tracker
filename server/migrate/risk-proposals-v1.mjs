@@ -1,6 +1,6 @@
 // Suggested risk levels, read only from the penalty wording already in the register. They are SUGGESTIONS for a reviewer.
 //   node migrate/risk-proposals-v1.mjs            show the split
-//   node migrate/risk-proposals-v1.mjs --apply    write app/risk-proposals.json
+//   node migrate/risk-proposals-v1.mjs --apply    write shared/risk-proposals.json
 // The health score never uses these until somebody accepts them (per record in the popup, or in bulk under Settings), because a
 // risk level is a judgement about legal importance and the register does not carry one. Records with no penalty text get no
 // suggestion at all and stay "Risk classification pending validation".
@@ -9,7 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const items = JSON.parse(fs.readFileSync(path.join(root, 'app', 'items.json'), 'utf8'));
+const items = JSON.parse(fs.readFileSync(path.join(root, 'shared', 'items.json'), 'utf8'));
 const CUSTODIAL = /imprison|prosecut|criminal|\bjail\b/i;
 const SEVERE = /cancel|revoc|suspen|stop.?work|closure|sealing|demolition|debar|black.?list/i;
 const MONETARY = /fine|penalt|interest|compensat|damages|charges/i;
@@ -29,9 +29,9 @@ for (const it of items) {
 }
 console.log(`Suggestions: critical ${count.critical}, high ${count.high}, medium ${count.medium}; no suggestion ${count.none} (of ${items.length}).`);
 if (process.argv.includes('--apply')) {
-  fs.writeFileSync(path.join(root, 'app', 'risk-proposals.json'), JSON.stringify({
+  fs.writeFileSync(path.join(root, 'shared', 'risk-proposals.json'), JSON.stringify({
     note: 'Suggested risk levels read from the register\'s own penalty wording. Not a legal classification and never used in scoring until a person accepts them.',
     generated_at: new Date().toISOString(), proposals
   }, null, 1) + '\n');
-  console.log('Wrote app/risk-proposals.json');
+  console.log('Wrote shared/risk-proposals.json');
 }

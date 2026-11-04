@@ -1,6 +1,6 @@
 // Coverage review: does the master register mention each law a real estate developer or an EPC contractor is typically subject to?
 //   node migrate/coverage-review.mjs            print the result
-//   node migrate/coverage-review.mjs --apply    also write app/coverage-gaps.json and data-prep/coverage-review.md
+//   node migrate/coverage-review.mjs --apply    also write shared/coverage-gaps.json and data-prep/coverage-review.md
 //
 // HOW TO READ IT. The checklist below is a first pass written by an AI model from general knowledge of Indian real estate and
 // construction law. It is NOT legal advice and may miss laws or include ones that do not apply to a given project. For each law the
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..', '..');
-const items = JSON.parse(fs.readFileSync(path.join(root, 'app', 'items.json'), 'utf8'));
+const items = JSON.parse(fs.readFileSync(path.join(root, 'shared', 'items.json'), 'utf8'));
 
 const RE = 'real_estate', EPC = 'epc';
 // [id, law, what it asks of the company, applies to, when it applies (confidence), search terms (regex source)]
@@ -97,7 +97,7 @@ console.log(out.join('\n'));
 
 if (process.argv.includes('--apply')) {
   const stamp = new Date().toISOString();
-  fs.writeFileSync(path.join(root, 'app', 'coverage-gaps.json'), JSON.stringify({
+  fs.writeFileSync(path.join(root, 'shared', 'coverage-gaps.json'), JSON.stringify({
     generated_at: stamp, checked_laws: CHECKLIST.length, register_records: items.length,
     note: 'First-pass check by an AI model from general knowledge of Indian real estate and construction law. Not legal advice. "Not found" means no register record mentions the law; it does not mean the law is being breached. Confirm each item with counsel before adding a record.',
     gaps, mentioned
@@ -108,5 +108,5 @@ if (process.argv.includes('--apply')) {
     `\n## Mentioned in the register (${mentioned.length})\n`, ...mentioned.map((m) => `- **${m.law}** — ${m.matched_count} record(s): ${m.matched_records.join(', ')}`)].join('\n');
   fs.mkdirSync(path.join(root, 'data-prep'), { recursive: true });
   fs.writeFileSync(path.join(root, 'data-prep', 'coverage-review.md'), md + '\n');
-  console.log('\nWrote app/coverage-gaps.json and data-prep/coverage-review.md');
+  console.log('\nWrote shared/coverage-gaps.json and data-prep/coverage-review.md');
 }

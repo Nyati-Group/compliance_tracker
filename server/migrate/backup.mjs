@@ -13,7 +13,7 @@ export async function backup(label = 'manual') {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   const dir = path.join(here, '..', 'backups', `${stamp}-${label}`);
   fs.mkdirSync(dir, { recursive: true });
-  for (const f of ['items.json', 'stages.json']) fs.copyFileSync(path.join(root, 'app', f), path.join(dir, f));
+  for (const f of ['items.json', 'stages.json']) fs.copyFileSync(path.join(root, 'shared', f), path.join(dir, f));
 
   const counts = {};
   if (process.env.MONGODB_URI) {

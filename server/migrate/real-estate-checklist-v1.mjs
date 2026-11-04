@@ -1,6 +1,6 @@
 // Migration: add the Real Estate Compliance checklist (CHK-001..CHK-209) from the consolidated CSV to the register.
 //   node migrate/real-estate-checklist-v1.mjs            dry run: compares the CSV with the register and prints the report, writes nothing
-//   node migrate/real-estate-checklist-v1.mjs --apply    backs up, then appends the new records to app/items.json and writes the report
+//   node migrate/real-estate-checklist-v1.mjs --apply    backs up, then appends the new records to shared/items.json and writes the report
 // The 306 records already in the register are never changed except for the derived "duplicate_group" link. Re-running adds nothing twice.
 // After applying, run:  node migrate/applicability-v1.mjs --apply   (adds the project-type setup questions that decide these records)
 import fs from 'node:fs';
@@ -12,7 +12,7 @@ import { backup } from './backup.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..', '..');
-const itemsFile = path.join(root, 'app', 'items.json');
+const itemsFile = path.join(root, 'shared', 'items.json');
 const csvFile = path.join(root, 'data-prep', 'Maharashtra_RealEstate_Compliance_Consolidated.csv');
 const reportFile = path.join(root, 'data-prep', 'real-estate-checklist-report.md');
 const APPLY = process.argv.includes('--apply');
@@ -141,8 +141,8 @@ const report = L.join('\n');
 
 console.log(report.split('\n').slice(0, 60).join('\n'));
 if (problems.length) { console.log(`\n${problems.length} problem(s). Nothing written.`); process.exit(1); }
-if (!APPLY) { console.log('\nDry run only. Re-run with --apply to write app/items.json.'); process.exit(0); }
+if (!APPLY) { console.log('\nDry run only. Re-run with --apply to write shared/items.json.'); process.exit(0); }
 await backup('before-real-estate-checklist');
 fs.writeFileSync(itemsFile, JSON.stringify(result, null, 1) + '\n');
 fs.writeFileSync(reportFile, report + '\n');
-console.log(`\nWrote ${result.length} records to app/items.json and the report to data-prep/real-estate-checklist-report.md`);
+console.log(`\nWrote ${result.length} records to shared/items.json and the report to data-prep/real-estate-checklist-report.md`);

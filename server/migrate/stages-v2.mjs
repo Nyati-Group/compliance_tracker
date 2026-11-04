@@ -1,6 +1,6 @@
 // Migration 001: stage framework v2 + per-record placement/level/deadline/duplicate metadata for the master register.
 //   node migrate/stages-v2.mjs            dry run: prints the report, writes nothing
-//   node migrate/stages-v2.mjs --apply    backs up, then writes app/items.json, app/stages.json and data-prep/stage-migration-report.md
+//   node migrate/stages-v2.mjs --apply    backs up, then writes shared/items.json, shared/stages.json and data-prep/stage-migration-report.md
 // Idempotent: every new field is derived from the original fields (legacy_stage_* is captured once), so re-running changes nothing.
 // Never touches MongoDB data other than reading stage_overrides for the report.
 import fs from 'node:fs';
@@ -12,8 +12,8 @@ import { backup } from './backup.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..', '..');
-const itemsFile = path.join(root, 'app', 'items.json');
-const stagesFile = path.join(root, 'app', 'stages.json');
+const itemsFile = path.join(root, 'shared', 'items.json');
+const stagesFile = path.join(root, 'shared', 'stages.json');
 const reportFile = path.join(root, 'data-prep', 'stage-migration-report.md');
 const APPLY = process.argv.includes('--apply');
 if (fs.existsSync(path.join(here, '..', '.env'))) process.loadEnvFile(path.join(here, '..', '.env'));
@@ -86,4 +86,4 @@ fs.writeFileSync(itemsFile, JSON.stringify(after, null, 1) + '\n');
 fs.writeFileSync(stagesFile, JSON.stringify(STAGES_V2, null, 1) + '\n');
 fs.mkdirSync(path.dirname(reportFile), { recursive: true });
 fs.writeFileSync(reportFile, report);
-console.log(`\nApplied. Wrote app/items.json, app/stages.json and ${path.relative(root, reportFile)}.`);
+console.log(`\nApplied. Wrote shared/items.json, shared/stages.json and ${path.relative(root, reportFile)}.`);

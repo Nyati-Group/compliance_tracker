@@ -1,6 +1,6 @@
-// Builds app/applicability.json: the setup questions ("flags") and which flags decide each conditional compliance record.
+// Builds shared/applicability.json: the setup questions ("flags") and which flags decide each conditional compliance record.
 //   node migrate/applicability-v1.mjs            validate only
-//   node migrate/applicability-v1.mjs --apply    validate, then write app/applicability.json
+//   node migrate/applicability-v1.mjs --apply    validate, then write shared/applicability.json
 // Every flag is a plain yes/no fact about the company, the project or one building, taken from the wording of the master's
 // own applicability condition. Nothing here is a new legal rule.
 import fs from 'node:fs';
@@ -10,7 +10,7 @@ import { createRequire } from 'node:module';
 import { CHK_FLAGS, CHK_GROUP, chkFlags } from './checklist-rules.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const appDir = path.join(here, '..', '..', 'app');
+const appDir = path.join(here, '..', '..', 'shared');
 const Core = createRequire(import.meta.url)(path.join(appDir, 'core.js'));
 
 const emp = (n) => [{ scope: 'company', field: 'employee_count', gte: n }];
@@ -128,5 +128,5 @@ problems.forEach((p) => console.log(' - ' + p));
 if (problems.length) process.exit(1);
 if (process.argv.includes('--apply')) {
   fs.writeFileSync(path.join(appDir, 'applicability.json'), JSON.stringify(catalogue, null, 1) + '\n');
-  console.log('Wrote app/applicability.json');
-} else console.log('Validation only. Re-run with --apply to write app/applicability.json.');
+  console.log('Wrote shared/applicability.json');
+} else console.log('Validation only. Re-run with --apply to write shared/applicability.json.');

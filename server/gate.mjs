@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadWorld, Core } from './generate.mjs';
 
-const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'app');
+const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'shared');
 export const loadDeps = () => JSON.parse(fs.readFileSync(path.join(appDir, 'dependencies.json'), 'utf8'));
 const today = () => new Date().toISOString().slice(0, 10);
 

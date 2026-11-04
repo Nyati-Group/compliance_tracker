@@ -10,7 +10,7 @@ import { computeHealth, buildRecommendations, aiFacts, mergeSettings, LEVELS } f
 import { notify } from './notify.mjs';
 import { askJson } from './chat.js';
 
-const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'app');
+const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'shared');
 const readJson = (f, fallback) => { try { return JSON.parse(fs.readFileSync(path.join(appDir, f), 'utf8')); } catch { return fallback; } };
 const sha = (s, n = 16) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, n);
 const todayISO = () => new Date().toISOString().slice(0, 10);

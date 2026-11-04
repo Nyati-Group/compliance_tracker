@@ -2,8 +2,7 @@
 // Reading and creating need a signed-in user with the "upload_docs" capability for writes. A document tied to a project follows that
 // project's access; a document without a project belongs to the person who made it (and to administrators).
 import crypto from 'node:crypto';
-import express from 'express';
-import rateLimit from 'express-rate-limit';
+import { rawBody, rateLimit } from './http.mjs';
 import { ObjectId } from 'mongodb';
 import { canSee, canWriteScope, hasCap } from './access.mjs';
 import { MAX_DOCX_BYTES, docxText, makeDocxTemplate, makeTextTemplate, addFieldToDocx, addFieldToText, removeFieldFromDocx, removeFieldFromText, buildDocx, slug } from './docx.mjs';
@@ -24,7 +23,7 @@ export function registerDocStudio(app, { db, bucket, requireCap, withScopes, aiC
   const store = (buffer, filename, meta) => new Promise((ok, no) => { const up = bucket.openUploadStream(filename, { metadata: meta }); up.on('finish', () => ok(String(up.id))).on('error', no); up.end(buffer); });
   const load = (fileId) => new Promise((ok, no) => { if (!ObjectId.isValid(fileId)) return no(Object.assign(new Error('File not found.'), { status: 404 })); const ch = []; bucket.openDownloadStream(new ObjectId(fileId)).on('data', (c) => ch.push(c)).on('error', () => no(Object.assign(new Error('File not found.'), { status: 404 }))).on('end', () => ok(Buffer.concat(ch))); });
   const drop = (fileId) => (ObjectId.isValid(fileId) ? bucket.delete(new ObjectId(fileId)).catch(() => {}) : null);
-  const aiLimiter = rateLimit({ windowMs: 60_000, limit: 6, standardHeaders: true, legacyHeaders: false, keyGenerator: (req) => String(req.user?._id || req.ip), message: { error: 'Too many reviews in a minute. Please wait a moment.' } });
+  const aiLimiter = rateLimit({ windowMs: 60_000, limit: 6, key: (req) => req.user?._id || req.ip, message: { error: 'Too many reviews in a minute. Please wait a moment.' } });
 
   /* ---------- access ---------- */
   const mine = (d, req) => d.created_by === req.user._id;
@@ -72,7 +71,7 @@ export function registerDocStudio(app, { db, bucket, requireCap, withScopes, aiC
   });
 
   // Upload a format (.docx, .pdf or .txt): fill-in fields are found automatically and shown for review before anyone uses it.
-  app.post('/files/docstudio/template', upload, express.raw({ type: () => true, limit: MAX_DOCX_BYTES }), async (req, res) => {
+  app.post('/files/docstudio/template', upload, rawBody({ limit: MAX_DOCX_BYTES, tooLarge: 'File is larger than 15 MB.' }), async (req, res) => {
     try {
       const fileName = clip(String(req.query.file_name || ''), 200).replace(/[\\/]/g, '_');
       if (!UPLOAD_EXT.test(fileName)) return res.status(400).json({ error: 'Upload a Word (.docx), PDF or text file.' });
@@ -95,7 +94,7 @@ export function registerDocStudio(app, { db, bucket, requireCap, withScopes, aiC
       const { preview, ...doc } = t;
       await templates().insertOne(doc);
       res.json({ ok: true, id: t._id, ...tplLight(doc), variables: t.variables, preview });
-    } catch (e) { if (e.type === 'entity.too.large') return res.status(413).json({ error: 'File is larger than 15 MB.' }); fail(res, e, 'could not read that file'); }
+    } catch (e) { fail(res, e, 'could not read that file'); }
   });
 
   // Rename, recategorise and refine the variables (label, type, required, auto-fill source). The field keys themselves stay fixed.
@@ -256,7 +255,7 @@ export function registerDocStudio(app, { db, bucket, requireCap, withScopes, aiC
   }
   const anaLight = (a) => ({ id: a._id, file_name: a.file_name, project_id: a.project_id, project_name: a.project_name, created_by_name: a.created_by_name, created_at: a.created_at, readiness: a.ai?.ok ? a.ai.result.readiness : null, document_type: a.ai?.ok ? a.ai.result.document_type : null, ai_ok: !!a.ai?.ok, basic: (a.basic || []).length });
 
-  app.post('/files/docstudio/analyse', upload, aiLimiter, withScopes, express.raw({ type: () => true, limit: MAX_DOCX_BYTES }), async (req, res) => {
+  app.post('/files/docstudio/analyse', upload, aiLimiter, withScopes, rawBody({ limit: MAX_DOCX_BYTES, tooLarge: 'File is larger than 15 MB.' }), async (req, res) => {
     try {
       const fileName = clip(String(req.query.file_name || ''), 200).replace(/[\\/]/g, '_');
       if (!UPLOAD_EXT.test(fileName)) return res.status(400).json({ error: 'Upload a Word (.docx), PDF or text file.' });
@@ -265,7 +264,7 @@ export function registerDocStudio(app, { db, bucket, requireCap, withScopes, aiC
       const fileId = await store(req.body, fileName, { analysis: true });
       try { const a = await review(req.body, fileName, { project, company: await companyOf(project), docType: clip(String(req.query.doc_type || ''), 120), user: req.user, fileId }); res.json({ ok: true, id: a.id }); }
       catch (e) { await drop(fileId); throw e; }
-    } catch (e) { if (e.type === 'entity.too.large') return res.status(413).json({ error: 'File is larger than 15 MB.' }); fail(res, e, 'could not review that file'); }
+    } catch (e) { fail(res, e, 'could not review that file'); }
   });
   app.post('/api/docstudio/analyse-generated', upload, aiLimiter, withScopes, async (req, res) => {
     try {

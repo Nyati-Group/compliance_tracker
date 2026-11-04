@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const appDir = path.join(here, '..', 'app');
+const appDir = path.join(here, '..', 'shared');
 export const Core = createRequire(import.meta.url)(path.join(appDir, 'core.js'));
 
 const mapById = (docs) => Object.fromEntries(docs.map(({ _id, ...rest }) => [String(_id), rest]));

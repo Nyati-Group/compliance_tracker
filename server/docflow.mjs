@@ -8,7 +8,7 @@ import { loadWorld, Core } from './generate.mjs';
 import { ctxForScope } from './gate.mjs';
 import { notify } from './notify.mjs';
 
-const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'app');
+const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'shared');
 let ORDER = null;
 const stageOrder = (id) => {
   if (!ORDER) { try { ORDER = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(appDir, 'stages.json'), 'utf8')).map((s) => [s.id, s.order])); } catch { ORDER = {}; } }

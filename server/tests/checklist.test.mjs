@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Core } from '../generate.mjs';
 
-const read = (f) => JSON.parse(fs.readFileSync(new URL('../../app/' + f, import.meta.url), 'utf8'));
+const read = (f) => JSON.parse(fs.readFileSync(new URL('../../shared/' + f, import.meta.url), 'utf8'));
 const items = read('items.json'), cat = read('applicability.json'), stages = read('stages.json');
 const chk = items.filter((i) => /^CHK-\d+$/.test(i.compliance_id));
 const byId = Object.fromEntries(items.map((i) => [i.compliance_id, i]));

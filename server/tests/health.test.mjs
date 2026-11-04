@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { Core } from '../generate.mjs';
 import { computeHealth, buildRecommendations, mergeSettings } from '../health.mjs';
 
-const app = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'app');
+const app = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'shared');
 const j = (f) => JSON.parse(fs.readFileSync(path.join(app, f), 'utf8'));
 const items = j('items.json'), cat = j('applicability.json'), profiles = j('profiles.json'), stages = j('stages.json'), deps = j('dependencies.json');
 const itemById = Object.fromEntries(items.map((i) => [i.compliance_id, i]));

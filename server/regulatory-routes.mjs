@@ -2,7 +2,7 @@
 // Reading: any signed-in user, limited to updates that touch projects they may see.
 // Reviewing (confirm / assign / task / close): capability review_regulatory + write access to the project concerned.
 // Sources, manual documents, manual runs: capability manage_settings (administrators).
-import express from 'express';
+import { rawBody } from './http.mjs';
 import { ObjectId } from 'mongodb';
 import { isRestricted, canSee, canWriteScope, ROLE_INFO } from './access.mjs';
 import { notify } from './notify.mjs';
@@ -283,12 +283,12 @@ export function registerRegulatory(app, { db, bucket, requireCap, withScopes, ai
     } catch (e) { fail(res, e); }
   });
   // The page's CSRF rule requires /files* + the fetch header for non-JSON bodies; the PDF is posted raw, details travel in the query string.
-  app.post('/files/regulatory', admin, express.raw({ type: () => true, limit: MAX_PDF }), async (req, res) => {
+  app.post('/files/regulatory', admin, rawBody({ limit: MAX_PDF, tooLarge: 'File is larger than 15 MB.' }), async (req, res) => {
     try {
       if (!Buffer.isBuffer(req.body) || req.body.length < 100 || req.body.subarray(0, 5).toString() !== '%PDF-') return res.status(400).json({ error: 'Upload a PDF file.' });
       const r = await addManual({ meta: req.query, buffer: req.body, user: req.user.name });
       res.json({ ok: true, ...r });
-    } catch (e) { if (e.type === 'entity.too.large') return res.status(413).json({ error: 'File is larger than 15 MB.' }); fail(res, e); }
+    } catch (e) { fail(res, e); }
   });
 
   return { deps };

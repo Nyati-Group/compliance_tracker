@@ -1,17 +1,20 @@
 # Compliance Tracker & Calendar — Nyati
 
-A Node/Express server that serves the single-page app in `app/` and stores all
-tracking data in MongoDB Atlas. Users sign in with email and password; roles are
-enforced on the server.
+A React app (built with Vite, in `client/`) and a plain Node server (`server/`, on `node:http`
+with a small router in `server/http.mjs` — no Express) that stores all tracking data in MongoDB
+Atlas. Users sign in with email and password; roles are enforced on the server.
 
 ## Run locally
 
 ```
-cd server
-npm install
-copy .env.example .env     # then fill in the values (see below)
-npm start                  # http://localhost:8000
+npm install                # in the repo root: React, Vite and the server's packages
+copy server\.env.example server\.env     # then fill in the values (see below)
+npm run dev                # API on :8000 (restarts on change) + Vite on http://localhost:5173 (hot reload)
 ```
+
+Open the Vite address; it forwards `/api`, `/auth`, `/files`, `/data` and `/images` to the API server.
+To run it the way production does instead: `npm run build` (writes `client/dist`), then `npm start`
+(http://localhost:8000 serves both the API and the built app). `npm test` runs the server tests.
 
 Required `.env` values: `MONGODB_URI`, and for the first run `ADMIN_EMAIL` +
 `ADMIN_PASSWORD` (creates the first admin when there are no users) and
@@ -20,6 +23,25 @@ change the password from **Settings** in the left menu.
 
 In Atlas, add your IP address under **Network Access**, otherwise the server cannot
 connect (the error looks like a TLS / "internal error" failure).
+
+## Demo data
+
+`server/migrate/demo-data.mjs` fills an **empty** database with a demo: one company, five projects (real estate,
+a redevelopment and two EPC sites at different stages), one user per role, statuses, documents (verified, pending,
+rejected, expiring, expired, older versions), risk levels, notifications, four weeks of score history, four fictional
+regulatory updates and a saved document. It refuses to run against a database that already has projects, tracking or
+users, so it cannot mix into real data. Use a separate database:
+
+```
+cd server
+set MONGODB_DB=compliance_demo
+set DEMO_PASSWORD=choose-a-password
+node migrate/demo-data.mjs            # dry run: shows the target
+node migrate/demo-data.mjs --apply
+```
+
+Then start the server with the same `MONGODB_DB` and sign in as `admin@demo.test` (or `manager@`, `owner@`, `approver@`,
+`depthead@`, `companyadmin@`, `pm@` — limited to one project — or `auditor@` — read-only — all `@demo.test`).
 
 ## Roles (enforced by the server)
 
@@ -38,8 +60,8 @@ user, not from anything the browser sends.
 Any host that runs Node or Docker works (Render, Railway, Fly.io, Azure, a VPS).
 A `Dockerfile` is included at the repo root.
 
-1. Create the service from this repo (Docker, or Node with root `server/`, build
-   `npm ci --omit=dev`, start `node server.js`).
+1. Create the service from this repo (Docker, or Node from the repo root: build
+   `npm ci && npm run build`, start `npm start`).
 2. Set these environment variables on the host (never commit them):
    - `NODE_ENV=production`
    - `MONGODB_URI`, `MONGODB_DB`
@@ -56,12 +78,13 @@ A `Dockerfile` is included at the repo root.
 
 ### Deploying to Vercel instead
 
-The app also runs on Vercel as a single serverless function (`api/index.mjs`, routed to by
-`vercel.json`) instead of the long-running `node server.js` process above. Everything in
-`app/`, `server/`, `images/` and `knowledge/` is bundled into that one function.
+The app also runs on Vercel: `npm run build` produces the React app in `client/dist`, which Vercel
+serves from its CDN, and every other request goes to a single serverless function
+(`api/index.mjs`, routed to by `vercel.json`) instead of the long-running `node server.js` process
+above. Everything in `server/`, `shared/`, `images/` and `knowledge/` is bundled into that function.
 
-1. Import the repo in Vercel. A root `package.json`/`package-lock.json` is included so Vercel's
-   build installs the same dependencies as `server/package.json`.
+1. Import the repo in Vercel. `vercel.json` sets the build command and output folder; the root
+   `package.json` holds the client's packages plus the same server dependencies as `server/package.json`.
 2. Set the same environment variables as above, plus `CRON_SECRET` (any long random string) —
    it guards the `/api/cron/daily` route that Vercel Cron calls instead of the in-process timers.
 3. `vercel.json` schedules that cron for 02:30 UTC (08:00 IST) daily. **On the Hobby plan, Vercel
@@ -78,14 +101,18 @@ The app also runs on Vercel as a single serverless function (`api/index.mjs`, ro
 
 ## Contents
 
-- `app/index.html` — the single-page app (dashboard, stages, calendar, register,
-  projects, data quality, users, item detail drawer).
-- `app/login.html` — sign-in page.
-- `app/items.json` — all 306 compliance items from the master sheet, with
+- `client/` — the React app. `src/views/` has one component per screen (dashboard, stages,
+  calendar, register, documents, vault, regulatory updates, projects, data quality, users,
+  settings), `src/components/` the record drawer, notifications and Ask AI, `src/state/store.jsx`
+  the shared data (collections are re-read every 5 seconds), `src/lib/records.js` the record logic.
+  `login.html` / `src/login.jsx` is the sign-in page.
+- `shared/items.json` — all compliance items from the master sheet, with
   normalized fields and a draft stage assignment.
-- `app/stages.json` — the 8 draft stages ("Proposed — needs compliance head
+- `shared/stages.json` — the draft stages ("Proposed — needs compliance head
   approval") plus "Unmapped to Stage".
 - `server/server.js` — API, authentication, role checks, static hosting.
+- `server/http.mjs` — the HTTP layer: routing, bodies, cookies, static files, rate limits,
+  security headers.
 - `data-prep/` — scripts that build `items.json` from the master Excel file.
 
 ## Re-running the data prep
@@ -97,7 +124,7 @@ top of `build_data.py` and re-run the three scripts in order:
 python3 build_data.py
 python3 normalize.py
 python3 stage_map.py
-cp items_final.json ../app/items.json
+cp items_final.json ../shared/items.json
 ```
 
 Compare the new `items_final.json` against the old one before redeploying (the
@@ -115,7 +142,7 @@ acceptance checks — item counts by department and type — are printed by
 
 ## Data model and migrations
 
-The master register (306 records) lives in `app/items.json`; MongoDB holds everything a team enters:
+The master register (306 records) lives in `shared/items.json`; MongoDB holds everything a team enters:
 `companies`, `projects`, `phases`, `buildings`, `applicability` (one decision per record per company/project/phase/building),
 `tracking`, `documents`, `audit`, `stage_overrides`, `users`.
 
@@ -124,25 +151,25 @@ Run from the `server` folder, in this order on a fresh setup:
 
 ```
 node migrate/stages-v2.mjs --apply          # stage framework S0-S8 + per-record stage/level/deadline metadata
-node migrate/applicability-v1.mjs --apply   # writes app/applicability.json (the set-up questions)
+node migrate/applicability-v1.mjs --apply   # writes shared/applicability.json (the set-up questions)
 node migrate/setup-v1.mjs --apply           # default company, a "Phase 1" per project, first applicability decisions
 node migrate/backup.mjs                     # a backup on its own, any time
 ```
 
-`app/core.js` is shared by the browser and the server: it decides which record is tracked against which company, project,
+`shared/core.js` is shared by the browser and the server: it decides which record is tracked against which company, project,
 phase or building, and how applicability is worked out from the set-up answers.
 
 More migrations and tools (all dry-run unless `--apply`, all take a backup first):
 
 ```
 node migrate/projects-v1.mjs --apply        # adds the client's 14 real estate + 13 EPC projects to the single company
-node migrate/coverage-review.mjs --apply    # checks the register against laws typical for real estate / EPC; writes app/coverage-gaps.json
+node migrate/coverage-review.mjs --apply    # checks the register against laws typical for real estate / EPC; writes shared/coverage-gaps.json
 ```
 
 Roles (`server/access.mjs`): Master Admin, Company Admin, Compliance Manager, Department Head, Compliance Owner, Approver,
 Project Manager, Auditor. A user can also be limited to chosen projects (Users tab); the server filters every read and write.
 
-Other data files in `app/`: `profiles.json` (what EPC vs real estate projects track), `applicability.json` (the set-up questions),
+Other data files in `shared/`: `profiles.json` (what EPC vs real estate projects track), `applicability.json` (the set-up questions),
 `dependencies.json` (proposed prerequisites between records; none are legally validated yet), `coverage-gaps.json`.
 Reminder rules are edited in Settings; a check runs 20 seconds after start and every 6 hours, and notices appear in the bell.
 ## Real Estate Compliance checklist (CHK-001 to CHK-209)
@@ -155,7 +182,7 @@ Each project answers one new setup question, "Is this a redevelopment project?".
 
 The Dashboard now opens with a health score, an AI analysis, risks, stage readiness, an action centre, document health and a trend, for the
 selected project, the company-wide view, or all projects. Code: `server/health.mjs` (the score; pure, no AI), `server/intel.mjs`
-(snapshots, recommendations, AI analysis and validation), routes in `server/server.js`, screens in `app/index.html`.
+(snapshots, recommendations, AI analysis and validation), routes in `server/server.js`, screens in `client/src/views/Dashboard.jsx`.
 
 ```
 node migrate/risk-proposals-v1.mjs --apply   # suggested risk levels read from the register's penalty wording (never used until accepted)
