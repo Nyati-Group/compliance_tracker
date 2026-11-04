@@ -3,7 +3,7 @@
   "outputDirectory": "client/dist",
   "functions": {
     "api/index.mjs": {
-      "includeFiles": "{server,shared,images,knowledge}/**",
+      "includeFiles": "{server,shared,images,knowledge,node_modules/pdf-parse}/**",
       "maxDuration": 60
     }
   },
