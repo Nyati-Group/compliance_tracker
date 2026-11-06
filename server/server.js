@@ -217,23 +217,16 @@ app.post('/auth/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// Load the signed-in user on every request so role changes and disabling take effect immediately.
-app.use(async (req, res, next) => {
-  try {
-    const t = readToken(getCookie(req, 'sid'));
-    if (t) {
-      const u = await users.findOne({ _id: t.e });
-      if (u && u.active !== false && (u.tv || 0) === t.v) req.user = u;
-    }
-    next();
-  } catch (e) { next(e); }
-});
+// Sign-in is switched off: every visitor uses the dashboard as this built-in administrator,
+// so anyone who can open the site can see and change everything.
+const OPEN_USER = Object.freeze({ _id: 'admin@local', name: 'Administrator', role: 'admin', active: true, tv: 0 });
+app.use((req, res, next) => { req.user = OPEN_USER; next(); });
 
 // Public: the login page, the logo and the built scripts/styles (content-hashed, so cached for good).
 const noCache = { 'Cache-Control': 'no-cache' };
 app.use(serveStatic(imagesDir, { prefix: '/images' }));
 app.use(serveStatic(path.join(clientDir, 'assets'), { prefix: '/assets', headers: () => ({ 'Cache-Control': 'public, max-age=31536000, immutable' }) }));
-app.get('/login.html', (req, res) => res.sendFile(path.join(clientDir, 'login.html'), noCache));
+app.get('/login.html', (req, res) => res.redirect('/')); // no sign-in page any more
 
 // Public, but guarded by a shared secret instead of a session: the daily reminder/health/regulatory
 // run, for a scheduler with no session of its own (e.g. Vercel Cron — see vercel.json). `cronDailyDeps.run`

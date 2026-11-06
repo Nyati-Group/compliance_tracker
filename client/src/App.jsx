@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './state/store.jsx';
 import { ModalHost } from './ui/ui.jsx';
-import { logout } from './lib/api.js';
 import { ctxValue, projectsIn } from './lib/records.js';
 import { PROJECT_CATS } from './lib/constants.js';
 import Bell from './components/Notifications.jsx';
@@ -97,7 +96,6 @@ export default function App() {
               <ProjectSelect />
               <span className="pill" style={{ cursor: 'default' }}>{me.name} · {me.role_label || me.role}</span>
               <Bell />
-              <button className="pill" type="button" onClick={logout}>Sign out</button>
             </div>
           </div>
           <main id="main">{S.loaded ? <View /> : <div className="empty-state">Loading compliance data…</div>}</main>

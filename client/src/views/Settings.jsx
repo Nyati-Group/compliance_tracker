@@ -21,7 +21,6 @@ export default function Settings() {
       <RiskClassification />
       <HealthSettings key={JSON.stringify((S.settingsMap || {}).health || null)} />
       <RegSources />
-      <Password />
     </>
   );
 }
@@ -131,27 +130,6 @@ function HealthSettings() {
         <button className="btn primary" type="button" onClick={() => put(fromForm(f), 'Saved. Every project score is being recalculated.')}>Save score settings</button>
         <button className="btn" type="button" onClick={() => { if (window.confirm('Put every score setting back to the suggested values?')) put(JSON.parse(JSON.stringify(DEFAULT_HEALTH_UI)), 'Reset to the suggested values.'); }}>Reset to the suggested values</button>
       </div>}
-    </div>
-  );
-}
-
-function Password() {
-  const S = useStore();
-  const { toast } = useUi();
-  const [cur, setCur] = useState(''), [next, setNext] = useState('');
-  const submit = async (e) => {
-    e.preventDefault();
-    try { await api('POST', '/auth/password', { current: cur, next }); setCur(''); setNext(''); toast('Password changed.'); } catch (err) { toast(err.message); }
-  };
-  return (
-    <div className="card" style={{ maxWidth: 420 }}>
-      <h3 style={{ marginBottom: 4 }}>Change password</h3>
-      <div style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 12 }}>Signed in as {S.me.name} ({S.me.email}) · {S.me.role_label || S.me.role}</div>
-      <form onSubmit={submit}>
-        <div className="field"><label>Current password</label><input type="password" autoComplete="current-password" required value={cur} onChange={(e) => setCur(e.target.value)} /></div>
-        <div className="field"><label>New password (min 10 characters)</label><input type="password" autoComplete="new-password" required minLength={10} value={next} onChange={(e) => setNext(e.target.value)} /></div>
-        <button className="btn primary" type="submit" style={{ marginTop: 12 }}>Change password</button>
-      </form>
     </div>
   );
 }
