@@ -372,8 +372,14 @@ let running = false;
 export async function startMonitoringRun(S, toast, body, sourceId) {
   if (running) { toast('A check is already running.'); return; }
   try {
-    const r = await api('POST', sourceId ? `/api/regulatory/sources/${encodeURIComponent(sourceId)}/run` : '/api/regulatory/run', body || {});
+    running = true; toast('Checking official sources… this can take up to a minute.', 6000);
+    const r = await api('POST', sourceId ? `/api/regulatory/sources/${encodeURIComponent(sourceId)}/run` : '/api/regulatory/run', body || {}).finally(() => { running = false; });
     if (r.skipped) { toast(r.reason || 'A check is already running.', 5000); return; }
+    if (r.finished) {   // serverless host: the run happened inside the request
+      const t = r.totals || {};
+      toast(`Check finished: ${t.new || 0} new, ${t.modified || 0} changed, ${t.duplicates || 0} duplicate, ${t.failed || 0} source problem(s).${r.partial ? ' Time limit reached — run again (or wait for the daily check) to read the rest.' : ''}`, 9000);
+      sourcesChanged(); S.loadRegulatory(); S.loadNotes(); return;
+    }
     running = true; toast('Checking official sources in the background… this can take a few minutes.', 6000);
     const since = new Date(Date.now() - 5000).toISOString();
     const poll = async () => {

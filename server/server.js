@@ -12,7 +12,7 @@ import { carryForward, carryAllExisting, mirrorStatus } from './docflow.mjs';
 import { notify, runReminders, getSettings, DEFAULT_SETTINGS } from './notify.mjs';
 import { loadShared, healthOf, publicHealth, saveSnapshot, previousSnapshot, trend as snapshotTrend, syncRecs, actOnRec, analyse, touchScopes, scopesForKey, runAll, autoAnalyse } from './intel.mjs';
 import { buildRecommendations, DEFAULT_HEALTH, mergeSettings as mergeHealthSettings } from './health.mjs';
-import { registerRegulatory, ensureIndexes as ensureRegulatoryIndexes } from './regulatory-routes.mjs';
+import { registerRegulatory, ensureIndexes as ensureRegulatoryIndexes, serverlessBudget } from './regulatory-routes.mjs';
 import { registerDocStudio } from './docstudio-routes.mjs';
 import { startScheduler as startRegulatoryScheduler, runMonitoring as runRegulatoryMonitoring } from './regulatory.mjs';
 import { initKnowledge, retrieve, trackingContext, buildContext, extractSources, askModel, askGemini, rewriteQueries } from './chat.js';
@@ -931,12 +931,17 @@ docStudio.ensureIndexes().catch((e) => console.error('Document indexes:', e.mess
 const runCarryForward = () => carryAllExisting(db, bucket)
   .then((n) => { if (n) { console.log(`Documents carried forward to later records: ${n}.`); touchAllSoon(); } })
   .catch((e) => console.error('Carry-forward failed:', e.message));
+// The call is killed at vercel.json maxDuration (60 s). Regulatory monitoring goes first with its own time budget
+// (it used to run after reminders + AI health refresh and was cut off before it read anything); what it cannot
+// finish stays unseen and is read on the next run.
 cronDailyDeps.run = async () => {
-  await runReminderCheck();
   if (process.env.REGULATORY_MONITORING !== 'off') {
-    const r = await runRegulatoryMonitoring(db, regulatory.deps(), { trigger: 'scheduled' });
-    if (!r.skipped) console.log(`Regulatory monitoring finished: ${r.run.totals.new} new, ${r.run.totals.modified} changed, ${r.run.totals.failed} source problem(s).`);
+    const budgetMs = process.env.VERCEL ? Math.min(serverlessBudget(), 35_000) : null;
+    const r = await runRegulatoryMonitoring(db, regulatory.deps(), { trigger: 'scheduled', budgetMs })
+      .catch((e) => { console.error('Regulatory monitoring failed:', e.message); return { skipped: true }; });
+    if (!r.skipped) console.log(`Regulatory monitoring finished: ${r.run.totals.new} new, ${r.run.totals.modified} changed, ${r.run.totals.failed} source problem(s)${r.run.partial ? ' (time limit reached; the rest follows next run)' : ''}.`);
   }
+  await runReminderCheck();
 };
 
 /* ----------------------------- app shell and register data (signed-in only) ----------------------------- */

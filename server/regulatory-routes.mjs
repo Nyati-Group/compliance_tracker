@@ -236,8 +236,15 @@ export function registerRegulatory(app, { db, bucket, requireCap, withScopes, ai
   app.post('/api/regulatory/run', admin, async (req, res) => {
     try { res.json({ ok: true, ...(await startRun({ trigger: req.body?.retry ? 'retry' : 'manual', user: req.user.name, onlyFailed: req.body?.retry === true })) }); } catch (e) { fail(res, e); }
   });
-  // A run can take minutes (polite delays + AI), so it continues in the background; the page polls /runs.
+  // A run can take minutes (polite delays + AI), so on a normal host it continues in the background; the page polls /runs.
+  // On Vercel the function is frozen as soon as the response is sent, so a background run never finished (and kept
+  // the lock): there the run happens inside the request, within the time limit; what is left is picked up next run.
   async function startRun(opts) {
+    if (process.env.VERCEL) {
+      const r = await runMonitoring(db, deps(), { ...opts, budgetMs: serverlessBudget() });
+      if (r.skipped) return { skipped: true, reason: r.reason };
+      return { started: true, finished: true, partial: !!r.run.partial, totals: r.run.totals };
+    }
     const p = runMonitoring(db, deps(), opts).catch((e) => ({ skipped: false, error: e.message }));
     const quick = await Promise.race([p, new Promise((ok) => setTimeout(() => ok(null), 600))]);
     if (quick && quick.skipped) return { skipped: true, reason: quick.reason };
@@ -293,6 +300,9 @@ export function registerRegulatory(app, { db, bucket, requireCap, withScopes, ai
 
   return { deps };
 }
+
+/** Time a monitoring run may use inside one serverless call (vercel.json maxDuration is 60 s; keep a margin for the response). */
+export const serverlessBudget = () => Math.max(15_000, Number(process.env.REGULATORY_TIME_BUDGET_MS) || 45_000);
 
 /** Insert the verified starting sources once (never overwrites an existing source). */
 export async function seedSources(db) {

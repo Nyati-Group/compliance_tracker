@@ -93,7 +93,10 @@ export async function robotsCheck(urlStr, { robots_ok = false } = {}) {
       const r = await fetch(`${origin}/robots.txt`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(15_000), redirect: 'follow' });
       status = r.status; if (r.ok) rules = parseRobots((await r.text()).slice(0, 200_000));
     } catch { status = 0; }
-    ent = { at: Date.now(), rules, status }; robotsCache.set(origin, ent);
+    ent = { at: Date.now(), rules, status };
+    // Only remember a definite answer. A timeout or server error is transient: caching it for an hour made every
+    // retry (and every "Run now" for the next hour) fail instantly without asking the site again.
+    if (status && status < 500) robotsCache.set(origin, ent); else robotsCache.delete(origin);
   }
   if (ent.status === 401 || ent.status === 403) { if (robots_ok) return true; throw new AccessError(`${origin} does not let automated readers see its robots.txt (HTTP ${ent.status}). Monitoring is off for this site unless an administrator confirms it is permitted; add documents manually instead.`, 'robots'); }
   if (ent.status >= 500 || ent.status === 0) throw new Error(`Could not read ${origin}/robots.txt (HTTP ${ent.status || 'no response'}); will retry.`);
@@ -496,8 +499,12 @@ async function acquire(db, ttlMs = 20 * 60_000) {
 const release = (db) => db.collection('settings').updateOne({ _id: 'regulatory_lock' }, { $set: { until: 0 } }).catch(() => {});
 const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 
-export async function checkSource(db, deps, source, { user = null } = {}) {
-  const stat = { source_id: source._id, name: source.name, status: 'ok', found: 0, new: 0, modified: 0, duplicates: 0, unchanged: 0, failed: 0, pending_ai: 0, error: null };
+// Time one document needs at most (fetch + AI analysis); a run with a deadline does not start a document with less left.
+const DOC_RESERVE_MS = 20_000;
+const timeLeft = (deadline) => (deadline ? deadline - Date.now() : Infinity);
+
+export async function checkSource(db, deps, source, { user = null, deadline = null } = {}) {
+  const stat = { source_id: source._id, name: source.name, status: 'ok', found: 0, new: 0, modified: 0, duplicates: 0, unchanged: 0, failed: 0, pending_ai: 0, deferred: 0, error: null };
   const col = db.collection('regulatory_sources');
   const fin = async () => {
     const f = stat.status === 'ok';
@@ -505,7 +512,7 @@ export async function checkSource(db, deps, source, { user = null } = {}) {
     return stat;
   };
   try {
-    const opts = { robots_ok: !!source.robots_confirmed };
+    const opts = { robots_ok: !!source.robots_confirmed, ...(deadline ? { retries: 1, timeout: 15_000 } : {}) };
     const list = await politeFetch(source.url, { ...opts, accept: 'text/html,application/xhtml+xml,application/xml,application/rss+xml' });
     const all = extractCandidates(list.buffer, list.type, list.finalUrl, source);
     stat.found = all.length;
@@ -523,8 +530,10 @@ export async function checkSource(db, deps, source, { user = null } = {}) {
     todo = todo.slice(0, take);
     if (first && skipped.length) await col.updateOne({ _id: source._id }, { $addToSet: { seen: { $each: skipped.map((c) => c.key).slice(0, 2000) } } });
     let newCount = 0;
-    for (const c of todo) {
+    for (const [n, c] of todo.entries()) {
       if (!known.has(c.key) && newCount >= MAX_NEW_PER_SOURCE) break;
+      // Out of time (serverless call limit): leave the rest unseen so the next run picks them up.
+      if (timeLeft(deadline) < DOC_RESERVE_MS) { stat.deferred = todo.length - n; break; }
       try {
         await sleep(1200);
         const d = await politeFetch(c.url, { ...opts, accept: 'application/pdf,text/html,*/*' });
@@ -533,11 +542,19 @@ export async function checkSource(db, deps, source, { user = null } = {}) {
         else if (r.status === 'modified') stat.modified++; else if (r.status === 'duplicate') stat.duplicates++; else if (r.status === 'unchanged') stat.unchanged++;
         await col.updateOne({ _id: source._id }, { $addToSet: { seen: c.key } });
       } catch (e) {
+        if (e.permanent) {
+          // A dead link (404, oversized file) will never work: remember it so it does not fail the source on every run.
+          stat.dead = (stat.dead || 0) + 1;
+          await col.updateOne({ _id: source._id }, { $addToSet: { seen: c.key } });
+          stat.warning = stat.warning || `Skipped a broken link on the listing — ${clip(c.title, 60)}: ${clip(e.message, 160)}`;
+          continue;
+        }
         stat.failed++; if (e instanceof AccessError && (e.code === 'captcha' || e.code === 'refused')) { stat.status = 'blocked'; stat.error = e.message; break; }
         stat.error = stat.error || `${clip(c.title, 60)}: ${clip(e.message, 200)}`;
       }
     }
-    if (stat.status === 'ok' && stat.failed && stat.failed === todo.length && todo.length) stat.status = 'failed';
+    const tried = todo.length - stat.deferred - (stat.dead || 0);
+    if (stat.status === 'ok' && stat.failed && stat.failed === tried) stat.status = 'failed';
   } catch (e) {
     stat.status = e instanceof AccessError ? 'blocked' : 'failed'; stat.error = clip(e.message, 400);
   }
@@ -559,8 +576,11 @@ export async function retryPending(db, deps, limit = 8) {
  * Check every enabled source (or one). Safe to call concurrently: a lock stops overlapping runs.
  * trigger: 'scheduled' | 'manual' | 'retry'
  */
-export async function runMonitoring(db, deps, { trigger = 'manual', user = null, sourceId = null, onlyFailed = false } = {}) {
-  if (!(await acquire(db))) return { skipped: true, reason: 'Another monitoring run is already in progress.' };
+export async function runMonitoring(db, deps, { trigger = 'manual', user = null, sourceId = null, onlyFailed = false, budgetMs = null } = {}) {
+  // budgetMs: on serverless the call is killed at its time limit, so the run stops starting new work before then and
+  // holds the lock only that long (a killed run must not block "Run now" for 20 minutes).
+  const deadline = budgetMs ? Date.now() + budgetMs : null;
+  if (!(await acquire(db, budgetMs ? budgetMs + 30_000 : undefined))) return { skipped: true, reason: 'Another monitoring run is already in progress.' };
   const run = { _id: `run_${Date.now().toString(36)}_${crypto.randomBytes(3).toString('hex')}`, trigger, by: user || 'scheduler', started_at: nowIso(), finished_at: null, sources: [], totals: { sources: 0, new: 0, modified: 0, duplicates: 0, failed: 0 } };
   const runs = db.collection('regulatory_runs');
   try {
@@ -570,12 +590,16 @@ export async function runMonitoring(db, deps, { trigger = 'manual', user = null,
     deps.profiles = await loadProfiles(db);
     deps.aiLeft = Math.max(0, Number(process.env.REGULATORY_AI_PER_RUN) || 15);
     deps.ocrLeft = Math.max(0, Number(process.env.REGULATORY_OCR_PER_RUN) || 8);
+    // Sources that have gone longest without a successful check go first, so a time-limited run never starves the same one.
+    sources.sort((a, b) => String(a.last_success || '').localeCompare(String(b.last_success || '')));
     for (const s of sources) {
       if (s.kind === 'manual') { run.sources.push({ source_id: s._id, name: s.name, status: 'manual', error: 'Manual source: add documents by hand.' }); continue; }
-      const st = await checkSource(db, deps, s, { user });
+      if (timeLeft(deadline) < DOC_RESERVE_MS) { run.sources.push({ source_id: s._id, name: s.name, status: 'deferred', error: 'Not checked in this run (time limit); it will be checked in the next run.' }); run.partial = true; continue; }
+      const st = await checkSource(db, deps, s, { user, deadline });
+      if (st.deferred) run.partial = true;
       run.sources.push(st); run.totals.sources++; run.totals.new += st.new; run.totals.modified += st.modified; run.totals.duplicates += st.duplicates; run.totals.failed += st.status === 'ok' ? 0 : 1;
     }
-    run.retry = await retryPending(db, deps).catch((e) => ({ error: e.message }));
+    if (timeLeft(deadline) >= DOC_RESERVE_MS) run.retry = await retryPending(db, deps, deadline ? 2 : 8).catch((e) => ({ error: e.message }));
   } catch (e) { run.error = clip(e.message, 300); }
   delete deps.aiLeft; delete deps.ocrLeft;
   run.finished_at = nowIso();
