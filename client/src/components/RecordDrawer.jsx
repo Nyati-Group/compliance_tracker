@@ -34,6 +34,7 @@ export default function RecordDrawer({ refKey }) {
   if (inst.readOnly) banners.push(['muted', 'This record is not part of the company or project you are looking at. Pick the matching one at the top to track it.']);
   else if (inst.state === 'na') banners.push(['muted', <><b>Not applicable.</b> {reasonText} Nothing to do here.</>]);
   else if (inst.state === 'review') banners.push(['hold', <><b>Not confirmed as applicable yet.</b> Open “Does this apply?” further down and decide.</>]);
+  if (it.review_note) banners.push(['hold', <><b>Review note.</b> {it.review_note}</>]);   // e.g. the cited Act was repealed; a "Verify:" point
   if (inst.blocked) banners.push(['hold', <><b>Blocked.</b> Finish {inst.blockedBy.map((b, i) => <span key={b.key}>{i > 0 && ', '}<span className="mono">{b.id}</span>{b.scopeShort && ` (${b.scopeShort})`}</span>)} first.</>]);
   else if (inst.ready) banners.push(['ok', <><b>Ready to start.</b> Everything it depends on is complete.</>]);
   if (inst.docs && (inst.docs.rejected || inst.docs.expired)) banners.push(['bad', <><b>A document needs attention.</b> One was rejected or has expired — see Documents.</>]);

@@ -12,10 +12,11 @@ const byId = Object.fromEntries(items.map((i) => [i.compliance_id, i]));
 const project = (facts) => ({ company: null, project: { category: 'real_estate', facts }, building: null });
 const ev = (id, facts) => Core.evaluate(cat, byId[id], project(facts)).status;
 
-test('the register holds the original 306 records plus the 209 checklist records, with unique ids', () => {
-  assert.equal(items.length, 515);
+test('the register holds the original 306 records, the 209 checklist records and the 23 HR records, with unique ids', () => {
+  assert.equal(items.length, 538);
   assert.equal(chk.length, 209);
-  assert.equal(new Set(items.map((i) => i.compliance_id)).size, 515);
+  assert.equal(items.filter((i) => /^HR-\d{3}$/.test(i.compliance_id)).length, 23);
+  assert.equal(new Set(items.map((i) => i.compliance_id)).size, 538);
   assert.equal(chk.filter((i) => i.source_track === 'New Project').length, 95);
   assert.equal(chk.filter((i) => i.source_track === 'Redevelopment').length, 114);
 });

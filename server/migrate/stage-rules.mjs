@@ -120,6 +120,10 @@ const R = [
   ['LAB', 5, 40, 'S8', 'high', 'Continuing labour-law duty', 'Company Level'],
   ['HRL', 1, 28, 'S8', 'high', 'Continuing industrial relations / bonus duty', 'Company Level'],
   ['HRL', 29, 31, 'S5', 'high', 'Contract-labour duties of the principal employer', 'Employee / Contractor Level'],
+  // ---- HR compliance expansion (HR-001..023, Nov 2026: Labour Codes, professional tax, salary TDS) ----
+  ['HR', 1, 1, 'S8', 'high', 'Continuing provident fund duty', 'Company Level'],
+  ['HR', 2, 2, 'S5', 'high', 'Contractor PF/ESI duties of the principal employer', 'Employee / Contractor Level'],
+  ['HR', 3, 23, 'S8', 'high', 'Continuing HR / payroll duty', 'Company Level'],
   // ---- Real Estate Compliance checklist (CHK-001..209) ----
   ...CHK_RULES,
 ];
@@ -155,10 +159,11 @@ export function placeItem(item) {
   return { stage_id: stage, stage_confidence: conf, stage_basis: basis, compliance_level: level || (item.level === 'Project Level' ? 'Project Level' : 'Company Level') };
 }
 
-// The master's own wording decides: "Applicable to all covered ..." is a general duty; anything else states a condition.
+// The master's own wording decides: "Applicable to all covered ..." (or "to every employer / entity / PTRC holder") is a
+// general duty; anything else states a condition.
 function applicabilityDefault(text) {
   if (!text) return 'Pending Review';
-  return /^applicable to all\b/i.test(text) ? 'Applicable' : 'Conditional';
+  return /^applicable to (all\b|every (employer|entity|ptrc holder)\b)/i.test(text) ? 'Applicable' : 'Conditional';
 }
 
 export function deadlineRule(it) {

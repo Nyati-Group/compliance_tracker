@@ -30,6 +30,8 @@ export const FLAGS = {
   employs_50plus: ['company', 'More than 50 workers', 'Does the establishment employ more than 50 workers? (or enter the employee count)', emp(51)],
   covered_epf: ['company', 'Covered under EPF', 'Is the establishment covered under the Employees\' Provident Fund?'],
   covered_esi: ['company', 'Covered under ESI', 'Is the establishment covered under the Employees\' State Insurance Act?'],
+  women_night_work: ['company', 'Women work at night', 'Are women employed between 7 pm and 6 am (for example sales events, site security, IT support)?'],
+  health_check_classes: ['company', 'Annual health check (40+)', 'Are there employees aged 40 or above in the classes prescribed for a free annual health examination under the OSH Code?'],
   covered_lwf: ['company', 'Covered under Maharashtra LWF Act', 'Is the establishment covered under the Maharashtra Labour Welfare Fund Act?'],
   tax_audit: ['company', 'Tax audit threshold met', 'Does turnover exceed the tax-audit limit (Rs.1 crore, or Rs.10 crore with cash transactions within 5%)?'],
   gstr9_threshold: ['company', 'GSTR-9 threshold met', 'Does aggregate turnover exceed Rs.2 crore (GSTR-9) or Rs.5 crore (GSTR-9C)?'],
@@ -60,7 +62,7 @@ export const FLAGS = {
 
 // Plain-language headings the set-up forms group the questions under.
 const GROUPS = {
-  'Employees & labour': ['workers_500plus', 'employs_5plus', 'employs_10plus', 'employs_20plus', 'employs_50plus', 'covered_epf', 'covered_esi', 'covered_lwf', 'intl_travel'],
+  'Employees & labour': ['workers_500plus', 'employs_5plus', 'employs_10plus', 'employs_20plus', 'employs_50plus', 'covered_epf', 'covered_esi', 'covered_lwf', 'intl_travel', 'women_night_work', 'health_check_classes'],
   'Vehicles': ['owns_vehicles'],
   'Tax & finance': ['tax_audit', 'gstr9_threshold', 'msme_vendors', 'has_exports', 'export_advances'],
   'Company law & governance': ['audit_committee', 'nrc', 'secretarial_audit', 'csr', 'sbo', 'fdi_construction', 'epc_abroad'],
@@ -83,6 +85,10 @@ set(['LAB-006', 'LAB-015', 'LAB-039'], ['employs_10plus']); set(range('LAB', 7, 
 set(['FIN-004'], ['tax_audit']); set(['FIN-009'], ['gstr9_threshold']); set(['FIN-011'], ['msme_vendors']);
 set(['SEC-009'], ['audit_committee']); set(['SEC-010'], ['nrc']); set(['SEC-014'], ['secretarial_audit']); set(['SEC-015'], ['csr']); set(['SEC-021'], ['sbo']);
 set(['SEC-025', 'SEC-026'], ['fdi_construction']); set(['SEC-027'], ['epc_abroad']); set(['SEC-028'], ['has_exports']); set(['SEC-029'], ['export_advances']);
+// HR compliance expansion (HR-xxx). Gratuity / maternity chapters: 10 or more employees; creche: 50 or more (the closest
+// setup question is "more than 50"); Shops & Establishments intimation: fewer than 20 workers.
+set(['HR-001'], ['covered_epf']); set(['HR-002'], ['contract_labour']); set(['HR-003', 'HR-004', 'HR-006', 'HR-007', 'HR-008'], ['employs_10plus']);
+set(['HR-009'], ['employs_50plus']); set(['HR-020'], ['health_check_classes']); set(['HR-021'], ['women_night_work']); set(['HR-023'], ['!employs_20plus']);
 set(['HRL-029'], ['contract_labour']); set(['HRL-030', 'HRL-031'], ['contract_workers_20plus']);
 set(['SAN-003'], ['near_aerodrome_defence']); set(['SAN-070'], ['land_acquisition']);
 

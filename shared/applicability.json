@@ -114,6 +114,18 @@
    "question": "Is the establishment covered under the Employees' State Insurance Act?",
    "group": "Employees & labour"
   },
+  "women_night_work": {
+   "scope": "company",
+   "label": "Women work at night",
+   "question": "Are women employed between 7 pm and 6 am (for example sales events, site security, IT support)?",
+   "group": "Employees & labour"
+  },
+  "health_check_classes": {
+   "scope": "company",
+   "label": "Annual health check (40+)",
+   "question": "Are there employees aged 40 or above in the classes prescribed for a free annual health examination under the OSH Code?",
+   "group": "Employees & labour"
+  },
   "covered_lwf": {
    "scope": "company",
    "label": "Covered under Maharashtra LWF Act",
@@ -491,6 +503,39 @@
   ],
   "SEC-029": [
    "export_advances"
+  ],
+  "HR-001": [
+   "covered_epf"
+  ],
+  "HR-002": [
+   "contract_labour"
+  ],
+  "HR-003": [
+   "employs_10plus"
+  ],
+  "HR-004": [
+   "employs_10plus"
+  ],
+  "HR-006": [
+   "employs_10plus"
+  ],
+  "HR-007": [
+   "employs_10plus"
+  ],
+  "HR-008": [
+   "employs_10plus"
+  ],
+  "HR-009": [
+   "employs_50plus"
+  ],
+  "HR-020": [
+   "health_check_classes"
+  ],
+  "HR-021": [
+   "women_night_work"
+  ],
+  "HR-023": [
+   "!employs_20plus"
   ],
   "HRL-029": [
    "contract_labour"
