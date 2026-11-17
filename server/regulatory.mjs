@@ -80,6 +80,17 @@ function robotsAllow(rules, p) {
   }
   return !best || best.allow;
 }
+/** Plain reason for a network failure (fetch hides it in e.cause), e.g. a site that silently drops foreign traffic. */
+export function netReason(e) {
+  const code = e?.cause?.code || e?.code || e?.name || '';
+  if (/CONNECT_TIMEOUT|ETIMEDOUT/i.test(code)) return 'the server could not connect to the site — it may block traffic from outside India';
+  if (/TimeoutError|AbortError/i.test(code)) return 'the site did not answer in time';
+  if (/ENOTFOUND|EAI_AGAIN/i.test(code)) return 'the site address could not be resolved';
+  if (/ECONNREFUSED|ECONNRESET|UND_ERR_SOCKET/i.test(code)) return 'the site closed the connection';
+  if (/CERT|SSL|TLS/i.test(code)) return 'the site\'s security certificate could not be verified';
+  return code ? `no response (${code})` : 'no response';
+}
+
 /**
  * robots.txt gate. Missing file (404) = allowed. 401/403 on robots.txt = we cannot tell, so refuse unless an admin
  * recorded that they confirmed the site permits it. Server errors / timeouts = try again later.
@@ -88,18 +99,18 @@ export async function robotsCheck(urlStr, { robots_ok = false } = {}) {
   const x = new URL(urlStr), origin = x.origin;
   let ent = robotsCache.get(origin);
   if (!ent || Date.now() - ent.at > 3600_000) {
-    let rules = [], status = 200;
+    let rules = [], status = 200, why = '';
     try {
       const r = await fetch(`${origin}/robots.txt`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(15_000), redirect: 'follow' });
       status = r.status; if (r.ok) rules = parseRobots((await r.text()).slice(0, 200_000));
-    } catch { status = 0; }
-    ent = { at: Date.now(), rules, status };
+    } catch (e) { status = 0; why = netReason(e); }
+    ent = { at: Date.now(), rules, status, why };
     // Only remember a definite answer. A timeout or server error is transient: caching it for an hour made every
     // retry (and every "Run now" for the next hour) fail instantly without asking the site again.
     if (status && status < 500) robotsCache.set(origin, ent); else robotsCache.delete(origin);
   }
   if (ent.status === 401 || ent.status === 403) { if (robots_ok) return true; throw new AccessError(`${origin} does not let automated readers see its robots.txt (HTTP ${ent.status}). Monitoring is off for this site unless an administrator confirms it is permitted; add documents manually instead.`, 'robots'); }
-  if (ent.status >= 500 || ent.status === 0) throw new Error(`Could not read ${origin}/robots.txt (HTTP ${ent.status || 'no response'}); will retry.`);
+  if (ent.status >= 500 || ent.status === 0) throw new Error(`Could not read ${origin}/robots.txt (${ent.status ? `HTTP ${ent.status}` : ent.why || 'no response'}); will retry.`);
   if (!robotsAllow(ent.rules, x.pathname + x.search)) throw new AccessError(`robots.txt on ${x.host} does not allow automated access to ${x.pathname}. Add documents from this site manually.`, 'robots');
   return true;
 }
@@ -127,7 +138,8 @@ export async function politeFetch(urlStr, { robots_ok = false, checkRobots = tru
         return { buffer, type, finalUrl: url };
       }
       throw new Error('Too many redirects.');
-    } catch (e) {
+    } catch (e0) {
+      const e = e0?.message === 'fetch failed' || e0?.name === 'TimeoutError' ? new Error(`Could not open ${new URL(url).host}: ${netReason(e0)}.`) : e0;
       lastErr = e;
       if (e instanceof AccessError || e.permanent || /Private network|valid web address|Only http|Could not resolve/.test(e.message)) throw e;
       if (attempt < retries) await new Promise((ok) => setTimeout(ok, 1500 * (attempt + 1)));

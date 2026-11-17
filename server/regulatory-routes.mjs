@@ -243,7 +243,7 @@ export function registerRegulatory(app, { db, bucket, requireCap, withScopes, ai
     if (process.env.VERCEL) {
       const r = await runMonitoring(db, deps(), { ...opts, budgetMs: serverlessBudget() });
       if (r.skipped) return { skipped: true, reason: r.reason };
-      return { started: true, finished: true, partial: !!r.run.partial, totals: r.run.totals };
+      return { started: true, finished: true, partial: !!r.run.partial, totals: r.run.totals, sources: r.run.sources };
     }
     const p = runMonitoring(db, deps(), opts).catch((e) => ({ skipped: false, error: e.message }));
     const quick = await Promise.race([p, new Promise((ok) => setTimeout(() => ok(null), 600))]);

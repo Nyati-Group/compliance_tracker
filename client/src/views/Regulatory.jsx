@@ -368,6 +368,9 @@ const sourceListeners = new Set();
 const sourcesChanged = () => sourceListeners.forEach((fn) => fn());
 let running = false;
 
+// The reason a source failed is recorded on the server; name it in the toast so it is not only in the sources table.
+const problems = (sources) => (sources || []).filter((s) => s.status === 'failed' || s.status === 'blocked').map((s) => ` ${s.name}: ${s.error || s.status}.`).join('');
+
 /** Start a monitoring run (all sources, failed ones only, or one source) and report when it finishes. */
 export async function startMonitoringRun(S, toast, body, sourceId) {
   if (running) { toast('A check is already running.'); return; }
@@ -377,7 +380,7 @@ export async function startMonitoringRun(S, toast, body, sourceId) {
     if (r.skipped) { toast(r.reason || 'A check is already running.', 5000); return; }
     if (r.finished) {   // serverless host: the run happened inside the request
       const t = r.totals || {};
-      toast(`Check finished: ${t.new || 0} new, ${t.modified || 0} changed, ${t.duplicates || 0} duplicate, ${t.failed || 0} source problem(s).${r.partial ? ' Time limit reached — run again (or wait for the daily check) to read the rest.' : ''}`, 9000);
+      toast(`Check finished: ${t.new || 0} new, ${t.modified || 0} changed, ${t.duplicates || 0} duplicate, ${t.failed || 0} source problem(s).${problems(r.sources)}${r.partial ? ' Time limit reached — run again (or wait for the daily check) to read the rest.' : ''}`, t.failed ? 15000 : 9000);
       sourcesChanged(); S.loadRegulatory(); S.loadNotes(); return;
     }
     running = true; toast('Checking official sources in the background… this can take a few minutes.', 6000);
@@ -388,7 +391,7 @@ export async function startMonitoringRun(S, toast, body, sourceId) {
         const mine = runs.find((x) => x.started_at >= since && x.finished_at);
         if (!mine) { setTimeout(poll, 5000); return; }
         running = false; const t = mine.totals || {};
-        toast(`Check finished: ${t.new || 0} new, ${t.modified || 0} changed, ${t.duplicates || 0} duplicate, ${t.failed || 0} source problem(s).`, 8000);
+        toast(`Check finished: ${t.new || 0} new, ${t.modified || 0} changed, ${t.duplicates || 0} duplicate, ${t.failed || 0} source problem(s).${problems(mine.sources)}`, t.failed ? 15000 : 8000);
         sourcesChanged(); S.loadRegulatory(); S.loadNotes();
       } catch (e) { running = false; toast(e.message); }
     };

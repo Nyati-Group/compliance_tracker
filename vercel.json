@@ -1,6 +1,7 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "client/dist",
+  "regions": ["bom1"],
   "functions": {
     "api/index.mjs": {
       "includeFiles": "{server,shared,images,knowledge,node_modules/pdf-parse}/**",
