@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { readDecisions, decisionsChanged, readReasons } from './decisions.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.join(here, '..', 'shared');
@@ -14,8 +15,9 @@ export async function loadWorld(db) {
   const items = JSON.parse(fs.readFileSync(path.join(appDir, 'items.json'), 'utf8'));
   const cat = JSON.parse(fs.readFileSync(path.join(appDir, 'applicability.json'), 'utf8'));
   const profiles = JSON.parse(fs.readFileSync(path.join(appDir, 'profiles.json'), 'utf8'));
-  const [companies, projects, phases, buildings, decisions] = await Promise.all(
-    ['companies', 'projects', 'phases', 'buildings', 'applicability'].map(async (c) => mapById(await db.collection(c).find().toArray())));
+  const [companies, projects, phases, buildings, decisions] = await Promise.all([
+    ...['companies', 'projects', 'phases', 'buildings'].map(async (c) => mapById(await db.collection(c).find().toArray())),
+    readDecisions(db).then((d) => d.map)]);   // cached; re-read only after a change (see decisions.mjs)
   return { items, itemById: Object.fromEntries(items.map((i) => [i.compliance_id, i])), cat, profiles, companies, projects, phases, buildings, decisions };
 }
 
@@ -43,9 +45,11 @@ export async function generate(db, scope, who = 'system', world = null) {
   const col = db.collection('applicability');
   const ops = [];
   const summary = { instances: insts.length, created: 0, updated: 0, unchanged: 0, manual_disagree: 0, byStatus: {} };
+  // The cached decisions leave out the reason text; an automatic decision is rewritten only when its status or reason changed.
+  const reasons = await readReasons(db, insts.filter((i) => w.decisions[i.key] && w.decisions[i.key].source !== 'manual').map((i) => i.key));
   for (const inst of insts) {
     const ev = Core.evaluate(w.cat, inst.item, Core.entitiesFor(w, inst));
-    const cur = w.decisions[inst.key];
+    const cur = w.decisions[inst.key] && { ...w.decisions[inst.key], reason: reasons[inst.key]?.reason };
     let finalStatus = ev.status;
     if (!cur) {
       summary.created++;
@@ -72,7 +76,7 @@ export async function generate(db, scope, who = 'system', world = null) {
     } else summary.unchanged++;
     summary.byStatus[finalStatus] = (summary.byStatus[finalStatus] || 0) + 1;
   }
-  if (ops.length) await col.bulkWrite(ops, { ordered: false });
+  if (ops.length) { await col.bulkWrite(ops, { ordered: false }); await decisionsChanged(db); }
   return summary;
 }
 
@@ -86,7 +90,7 @@ export async function decide(db, { key, status, reason }, user) {
   const inst = all.find((i) => i.key === key);
   if (!inst) throw Object.assign(new Error('That record is not part of any company or project yet.'), { status: 400 });
   const now = new Date().toISOString();
-  const cur = w.decisions[key];
+  const cur = w.decisions[key] && { ...w.decisions[key], ...(await readReasons(db, [key]))[key] };   // with its stored flags
   const why = String(reason || '').trim().slice(0, 1000);
   let next;
   if (status === 'auto') {
@@ -103,5 +107,6 @@ export async function decide(db, { key, status, reason }, user) {
     $unset: { auto_suggestion: '' },
     $push: { history: entry }
   }, { upsert: true });
+  await decisionsChanged(db);
   return { ok: true, status: next.status };
 }

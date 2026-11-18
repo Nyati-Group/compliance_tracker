@@ -6,6 +6,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { generate, decide, loadWorld, Core } from './generate.mjs';
+import { readDecisions, decisionsChanged } from './decisions.mjs';
 import { CAPS, ROLE_INFO, ROLES, capsOf, hasCap, isRestricted, scopeOfKey, allowedScopes, canSee, canWriteScope } from './access.mjs';
 import { completionGate, gateMessage, newlyReady } from './gate.mjs';
 import { carryForward, carryAllExisting, mirrorStatus } from './docflow.mjs';
@@ -68,7 +69,10 @@ const SESSION_MS = 12 * 60 * 60 * 1000;
 const MIN_PASSWORD = 10;
 
 /* ----------------------------- database ----------------------------- */
-const client = new MongoClient(MONGODB_URI);
+// zlib (built into the driver) shrinks what Atlas sends; it matters on a free-tier cluster with throttled transfer.
+// A free-tier cluster also accepts only 500 connections in total, and on Vercel every running copy of this server opens its
+// own pool (100 by default), so keep each pool small and let idle connections close.
+const client = new MongoClient(MONGODB_URI, { compressors: ['zlib'], maxPoolSize: 5, minPoolSize: 0, maxIdleTimeMS: 60000 });
 try { await client.connect(); }
 catch (e) { console.error('MongoDB connection failed:', e.message); fatal('Could not connect to MongoDB. Check MONGODB_URI, and that Atlas Network Access allows this host (Vercel has no fixed IP: allow 0.0.0.0/0).'); }
 const db = client.db(MONGODB_DB);
@@ -444,6 +448,7 @@ app.delete('/api/:col/:id', withScopes, async (req, res, next) => {
     }
     await db.collection(col).deleteOne({ _id: id });
     await db.collection('applicability').deleteMany({ _id: suffix, source: 'auto' });
+    await decisionsChanged(db);
     await generate(db, { projectId: doc.project_id }, req.user.name);
     res.json({ ok: true });
   } catch (e) { console.error(e); res.status(500).json({ error: 'server error' }); }
@@ -711,6 +716,34 @@ function stamp(col, data, user) {
   if (col === 'settings') { data.updated_by = user.name; data.updated_at = now; }
   return data;
 }
+
+// The applicability list: a row per record per company/project, read on every page load. It comes from the server's cached
+// copy (decisions.mjs, re-read from MongoDB only after a change) and carries an ETag, so a browser that already has the
+// current list gets "304 Not Modified" instead of the whole list again. The reason text and history, shown only when one
+// record is opened, are left out (see /detail below).
+app.get('/api/applicability', withScopes, async (req, res) => {
+  try {
+    const c = await readDecisions(db);
+    const who = req.allowed.all ? 'all' : crypto.createHash('sha1').update([...req.allowed.ids].sort().join(',')).digest('hex');
+    const etag = `W/"${c.version}.${who}"`;
+    res.setHeader('ETag', etag);
+    res.setHeader('Cache-Control', 'private, no-cache');
+    if (req.headers['if-none-match'] === etag) { res.statusCode = 304; return res.end(); }
+    const rows = [];
+    for (const [id, data] of Object.entries(c.map)) if (canSee(req.allowed, scopeOfKey(id))) rows.push({ id, data });
+    res.json(rows);
+  } catch (e) { console.error(e); res.status(500).json({ error: 'db error' }); }
+});
+
+// One applicability decision's reason and history (the list above leaves them out).
+app.get('/api/applicability/:id/detail', withScopes, async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    if (!canSee(req.allowed, scopeOfKey(id))) return res.status(404).json({ error: 'not found' });
+    const d = await db.collection('applicability').findOne({ _id: id }, { projection: { reason: 1, history: 1 } });
+    res.json({ reason: d?.reason || '', history: d?.history || [] });
+  } catch (e) { console.error(e); res.status(500).json({ error: 'db error' }); }
+});
 
 // List documents. Optional: ?key=...&orderBy=at&dir=desc&limit=25
 app.get('/api/:col', guard, withScopes, async (req, res) => {

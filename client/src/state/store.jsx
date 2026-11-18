@@ -26,6 +26,12 @@ const COLLECTIONS = {
     return m;
   }]
 };
+// The database sends data slowly, so lists are re-read sparingly: changes made on this page reload what they touch at once,
+// other people's changes show up within REFRESH_MS. Applicability answers "not modified" when unchanged, so it is cheap.
+const REFRESH_MS = 30000;
+const SLOW = new Set(['documents']);
+const FAST = Object.keys(COLLECTIONS).filter((n) => !SLOW.has(n));
+const SLOW_EVERY = 4;    // × 30 s = every 2 minutes
 const EMPTY = Object.fromEntries(Object.values(COLLECTIONS).map(([field]) => [field, {}]));
 const VIEWS = ['dashboard', 'stages', 'calendar', 'register', 'documents', 'vault', 'regulatory', 'projects', 'dq', 'users', 'settings'];
 
@@ -46,9 +52,13 @@ export function StoreProvider({ me, roles, capLabels, statics, children }) {
   const [loaded, setLoaded] = useState(false);
   const sigs = useRef({});
 
-  /** Re-read some collections right away (instead of waiting for the next refresh). Only real changes re-render. */
+  const inFlight = useRef({});
+  /** Re-read some collections right away (instead of waiting for the next refresh). Only real changes re-render.
+   *  A collection that is still loading is not asked for again (a slow database would otherwise pile up requests). */
   const reload = useCallback(async (names = Object.keys(COLLECTIONS)) => {
-    const results = await Promise.all(names.map((n) => api('GET', '/api/' + n).then((rows) => [n, rows]).catch((e) => { console.warn(n + ' load error', e); return null; })));
+    const load = (n) => inFlight.current[n] || (inFlight.current[n] = api('GET', '/api/' + n).then((rows) => [n, rows])
+      .catch((e) => { console.warn(n + ' load error', e); return null; }).finally(() => { delete inFlight.current[n]; }));
+    const results = await Promise.all(names.map(load));
     const patch = {};
     for (const r of results) {
       if (!r) continue;
@@ -61,10 +71,19 @@ export function StoreProvider({ me, roles, capLabels, statics, children }) {
     if (Object.keys(patch).length) setCols((prev) => ({ ...prev, ...patch }));
   }, []);
 
+  // Lists refresh every 30 s, documents every 2 min, and straight after a change made on this page (each action calls
+  // reload([...]) itself). Nothing refreshes while the tab is hidden; everything does when it is shown again.
   useEffect(() => {
     reload().then(() => setLoaded(true));
-    const t = setInterval(() => reload(), 5000);
-    return () => clearInterval(t);
+    let ticks = 0;
+    const t = setInterval(() => {
+      if (document.hidden) return;
+      ticks++;
+      reload(ticks % SLOW_EVERY === 0 ? undefined : FAST);
+    }, REFRESH_MS);
+    const onShow = () => { if (!document.hidden) reload(); };
+    document.addEventListener('visibilitychange', onShow);
+    return () => { clearInterval(t); document.removeEventListener('visibilitychange', onShow); };
   }, [reload]);
 
   const D = useMemo(() => ({ ...statics, ...cols }), [statics, cols]);

@@ -18,6 +18,9 @@ export default function RecordDrawer({ refKey }) {
   const { openModal } = useUi();
   const inst = resolveInst(S, S.inst, S.instByKey, refKey);
   const [docSel, setDocSel] = useState('');
+  // The decision list leaves out the reason and history; read them for this record (again whenever the decision changes).
+  const dec = inst && inst.decision;
+  const [detail] = useRemote(dec ? `/api/applicability/${encodeURIComponent(inst.key)}/detail?v=${dec.history_count || 0}` : null, 0);   // every change adds a history entry
   if (!inst) return <ModalHead title="Record not found" />;
   const it = inst.item, tr = inst.tr;
   const open = (ref) => openModal(<RecordDrawer refKey={ref} />);
@@ -25,7 +28,7 @@ export default function RecordDrawer({ refKey }) {
   const st = statusDef(inst.status);
   const dl = deadlineSummary(it, fmtDate);
   const appCls = inst.state === 'na' ? 'neutral' : inst.state === 'review' ? 'hold' : 'ok';
-  const reasonText = inst.decision && inst.decision.reason ? inst.decision.reason : '';
+  const reasonText = detail ? detail.reason : '';
   const owner = named(it.owner), approver = named(it.approver);
   const shown = inst.state === 'na' ? ['neutral', '—', 'Not applicable'] : [st.cls, st.ic, inst.status];
   const hasPrereq = S.deps.edges.some((e) => e.to === it.compliance_id || e.from === it.compliance_id);
@@ -92,7 +95,7 @@ export default function RecordDrawer({ refKey }) {
           <div className="fold-body"><PrereqPanel inst={inst} open={open} /></div></details>}
 
         <details className="fold" open={inst.state === 'review' || undefined}><summary><span>Does this apply?</span><Badge cls={appCls}>{inst.appStatus}</Badge></summary>
-          <div className="fold-body"><ApplicabilityPanel inst={inst} /></div></details>
+          <div className="fold-body"><ApplicabilityPanel inst={inst} detail={detail} /></div></details>
 
         <details className="fold"><summary><span>History of changes</span></summary><div className="fold-body"><AuditList recordKey={inst.key} /></div></details>
       </div>
@@ -200,7 +203,7 @@ function PrereqPanel({ inst, open }) {
 }
 
 /* ---------- applicability decision ---------- */
-function ApplicabilityPanel({ inst }) {
+function ApplicabilityPanel({ inst, detail }) {
   const S = useStore();
   const { toast } = useUi();
   const [status, setStatus] = useState(inst.appStatus);
@@ -216,7 +219,7 @@ function ApplicabilityPanel({ inst }) {
     <section className="panel"><h4>Applicability — {inst.scopeLabel}</h4>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 6 }}><Badge cls={cls}>{inst.appStatus}</Badge>
         <Chip>{d ? (d.source === 'manual' ? 'Decided by ' + d.decided_by : 'Decided by the rules') : 'Not evaluated yet'}</Chip></div>
-      <div className="prose" style={{ fontSize: 12.5 }}>{d ? d.reason : 'Not evaluated yet. Save the set-up for this company or project to evaluate it.'}</div>
+      <div className="prose" style={{ fontSize: 12.5 }}>{d ? (detail ? detail.reason : 'Loading…') : 'Not evaluated yet. Save the set-up for this company or project to evaluate it.'}</div>
       {d && d.auto_suggestion && <div className="readonly-note" style={{ marginTop: 8, borderLeft: '3px solid var(--warn)' }}>The rules now suggest <b>{d.auto_suggestion.status}</b> ({d.auto_suggestion.reason}). The decision above was made by a person and has not been changed.</div>}
       {can && <>
         <div className="field" style={{ marginTop: 10 }}><label>Change the decision</label><select value={status} onChange={(e) => setStatus(e.target.value)}>{Core.APPLICABILITY.map((s) => <option key={s}>{s}</option>)}</select></div>
@@ -226,8 +229,9 @@ function ApplicabilityPanel({ inst }) {
           {d && d.source === 'manual' && <button className="btn" type="button" onClick={() => decide('auto', '')}>Back to automatic</button>}
         </div>
       </>}
-      {d && d.history && d.history.length > 0 && <details style={{ marginTop: 10 }}><summary style={{ cursor: 'pointer', fontSize: 12, color: 'var(--text-muted)' }}>History ({d.history.length})</summary>
-        {d.history.slice().reverse().map((h, i) => <div key={i} className="audit-entry"><b>{h.by}</b> — {h.from || 'new'} → <b>{h.to}</b> ({h.source})<br />{new Date(h.at).toLocaleString()} · {h.reason || ''}</div>)}</details>}
+      {d && d.history_count > 0 && <details style={{ marginTop: 10 }}><summary style={{ cursor: 'pointer', fontSize: 12, color: 'var(--text-muted)' }}>History ({d.history_count})</summary>
+        {!detail && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Loading…</div>}
+        {(detail ? detail.history : []).slice().reverse().map((h, i) => <div key={i} className="audit-entry"><b>{h.by}</b> — {h.from || 'new'} → <b>{h.to}</b> ({h.source})<br />{new Date(h.at).toLocaleString()} · {h.reason || ''}</div>)}</details>}
     </section>
   );
 }
